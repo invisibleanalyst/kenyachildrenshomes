@@ -1,10 +1,18 @@
-# Kenya Children’s Homes
+# Kenya Children’s Homes — Design 02 / Discovery
 
-A five-page React + Vite design prototype using Figtree, DM Mono, and red, white, and black. Fonts and Kenya-focused editorial artwork are served locally.
+A separate five-page React + Vite design direction: immersive landscape imagery, flowing wave transitions, editorial story chapters, and an interactive county atlas. Figtree is the primary font; DM Mono provides annotation and navigation details.
 
-## Development
+## Design branches
 
-Use the existing `/workspace/kenyachildrenshomes` checkout; no worktree is needed.
+- `main` and `design-01-original`: original Design 01.
+- `design-01-refined`: refined Design 01, preserved on its own branch.
+- `design-02`: this discovery and storytelling direction.
+
+Switch branches to compare implementations. No worktree is needed in the isolated cloud environment. `design-previews/` contains current screenshots for this branch. Existing Design 01 helper files remain available but are not imported by the Design 02 entry point.
+
+## Run and validate
+
+Requires Node.js 22+ (validated with Node 24). Use the existing checkout:
 
 ```sh
 cd /workspace/kenyachildrenshomes
@@ -12,41 +20,34 @@ npm ci --cache /tmp/npm-cache
 npm run dev
 ```
 
-Requires Node.js 22 or newer. Vite serves the site on port 5173. Routes: `/`, `/about`, `/projects`, `/impact`, `/donate`.
+Vite defaults to port 5173. Routes: `/`, `/about`, `/projects`, `/impact`, `/donate`.
 
 ```sh
 npm run build
 npm test
 ```
 
-Browser tests use `/usr/bin/chromium` in this cloud environment. Set `CHROMIUM_PATH` to an installed Chromium executable elsewhere. The test runner starts Vite if it is not already running.
+The Playwright runner starts Vite if needed and uses `/usr/bin/chromium`. Set `CHROMIUM_PATH` on another machine. Tests cover five routes, image/font loading, all 47 counties, keyboard navigation, atlas layers, project filtering, delivery-ring controls, outcome/year controls, story chapters, giving themes, donation preview, the UK–Kenya story connection, and mobile overflow at 320px and 375px.
 
-## Content and integrations
+## Vercel preview
 
-- `src/data.js` contains one fictional project for each of Kenya’s 47 counties. Totals and charts derive from the same data. Replace these examples with verified project and impact records.
-- Home uses a portfolio map; Projects uses a delivery-progress heatmap with county assessment and next actions; Impact uses outcome-intensity layers for learning, family support, and nutrition. Each county map supports hover, keyboard selection, click, and a mobile dropdown. About uses a symbolic UK–Kenya connection map.
-- Projects and Impact intentionally use separate measures: project delivery stages versus child/family wellbeing outcomes. Reporting-year controls and outcome switches are interactive. All numbers remain fictional.
-- Homepage storytelling and the donation journey use image-filled numerals. The donation journey describes a proposed four-stage process; it is not transaction tracking.
-- Team artwork represents roles, not real employees. No staff names or biographies are invented.
-- The donation page supports preset/custom KES amounts, monthly/one-off selection, M-Pesa/card selection, and client-side validation. It never stores or submits personal details or takes payment. Use example details while testing. Payment processing, recurring billing, receipts, and CMS editing are not implemented.
-- Before payment integration, verify the selected provider’s charity eligibility and support for M-Pesa, cards, and recurring donations. Do not assume Polar supplies all three.
-- Organisation history, actual programme descriptions, verified impact, approved photography, staff profiles, and final logo assets still need to be supplied. The current logo is a CSS approximation.
-- `vercel.json` rewrites application routes to `index.html` while preserving image and build asset paths. No environment variables are needed for the concept site.
+Connect this GitHub repository to Vercel and deploy `design-02` as a Preview branch. Framework: Vite; build: `npm run build`; output: `dist`; repository root. No environment variables are needed. `vercel.json` provides direct-link routing. A Git push alone does not prove a Vercel deployment was created or succeeded.
 
-## Design versions
+## Content and payment boundaries
 
-- `design-01-original`: the original committed design.
-- `design-01-refined`: this revision, with larger type, rounder frames, image-filled numerals, distinct map experiences, donation storytelling, and team-role portraits.
-- `main` remains the original design until a preferred version is merged.
-- With a connected Vercel project, branch deployments can provide separate browser previews. No deployment is performed by these repository changes.
-- `design-previews/` contains current screenshots for review on GitHub.
+- Projects and outcomes in `src/data.js` are fictional presentation content. Verify and replace figures, geography, programme claims, and reporting records before publication.
+- The atlas uses authentic county geometry, decorative route connections, and computed bounding-box centres. Dots and routes are not verified service locations. Layer controls alter emphasis without removing keyboard access to any county.
+- Ring segments use the project status counts; outcome totals and yearly figures derive from the presentation dataset. Flowing ribbons are a narrative visual rather than a quantitative stacked chart.
+- The UK–Kenya connection is symbolic. Team images represent roles, not actual employees; biographies and identities are not invented.
+- The giving-theme selector explores themes and does not earmark funds. The form validates locally, does not transmit personal details, and never takes payment. The gift route is a proposed process, not transaction tracking.
+- M-Pesa/card processing, recurring billing, receipts, CMS editing, verified financial reporting, and actual donation allocation are not implemented. Verify provider compatibility before integration.
+- Actual photography, final logo assets, staff profiles, and verified organisational copy still need approval. The header retains a compact presentation notice.
 
-## Asset sources
+## Image and map sources
 
-- `public/images/kenya-stories.png`: AI-created editorial artwork for this concept, with six scenes, now used for the original team-role portraits. The children, educator, and outdoor-care scenes have been replaced by individual artwork files (`children-care.png`, `learning-care.png`, and `community-care.png`). These show happy Kenyan children with nurturing adults. Individual scenes use `object-fit: cover` and controlled focal points; numerical overlays use proportional background cover sizing. It does not depict actual beneficiaries or staff. Source photo downloads remain blocked in this environment; approved real photographs remain a pre-publication requirement.
-
-- County geometry: `@svg-maps/kenya` 2.0.0, SVG Maps / Mihai Ro, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), https://github.com/VictorCazanave/svg-maps/tree/master/packages/kenya. Styling and interactions are adapted here.
-- Original-design photos, retained but unused in this revision: MDN learning-area `elva-800w.jpg` and `elva-fairy-800w.jpg`, https://github.com/mdn/learning-area/tree/main/html/multimedia-and-embedding/responsive-images. Repository license: CC0 1.0. These are general design placeholders and do not depict the organisation’s work. Replace with approved Kenyan programme photography before launch.
-- Fonts: Figtree and DM Mono via Fontsource; font packages include their licenses.
-
-The organisation’s current website returned HTTP 403 in this environment, so none of its images were copied.
+- `discovery-journey.png` and `discovery-together.png`: new AI-created photo-style concept images for Design 02, representing a Kenyan landscape journey and a caring outdoor learning activity. They do not depict actual beneficiaries.
+- `children-care.png` and `community-care.png`: generated care scenes shared with Design 01 where relevant. All displayed photos preserve natural proportions with `object-fit: cover`.
+- `kenya-stories.png`: created editorial role portraits, retained for the About page.
+- Original MDN photographs remain unused in this design; their original CC0 source is https://github.com/mdn/learning-area/tree/main/html/multimedia-and-embedding/responsive-images.
+- County geometry: `@svg-maps/kenya` 2.0.0, SVG Maps / Mihai Ro, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), https://github.com/VictorCazanave/svg-maps/tree/master/packages/kenya. Design 02 adapts geometry styling and interactions.
+- Figtree and DM Mono are served locally through Fontsource; font packages include their licenses.
