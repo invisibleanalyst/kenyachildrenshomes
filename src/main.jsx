@@ -359,13 +359,13 @@ function Home() {
           <div className="image-cutout main-cutout">
             <Art
               scene="children"
-              label="Editorial artwork of Kenyan schoolchildren outdoors"
+              label="Editorial artwork of a Kenyan child and a caring adult"
             />
           </div>
           <div className="image-cutout small-cutout">
             <Art
               scene="learning"
-              label="Editorial artwork of a Kenyan educator reading with a child"
+              label="Editorial artwork of Kenyan children reading with an educator"
             />
           </div>
           <span className="hero-star">✦</span>

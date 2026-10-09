@@ -9,16 +9,23 @@ test("five pages render, photos and fonts load, and routes support browser histo
     await expect(page.locator("h1")).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     await expect(page.locator(".editorial-art").first()).toBeVisible();
-    expect((await page.request.get("/images/kenya-stories.png")).status()).toBe(
-      200,
-    );
+    await expect
+      .poll(() =>
+        page
+          .locator(".single-scene img")
+          .evaluateAll(
+            (images) =>
+              images.length > 0 &&
+              images.every((img) => img.complete && img.naturalWidth > 0),
+          ),
+      )
+      .toBe(true);
     expect(
-      await page.evaluate(async () => {
-        const img = new Image();
-        img.src = "/images/kenya-stories.png";
-        await img.decode();
-        return img.naturalWidth > 1000;
-      }),
+      await page
+        .locator(".single-scene img")
+        .evaluateAll((images) =>
+          images.every((img) => getComputedStyle(img).objectFit === "cover"),
+        ),
     ).toBe(true);
     expect(
       await page.evaluate(
@@ -181,4 +188,43 @@ test("about has a UK–Kenya connection map and role-based team portraits", asyn
   await expect(page.locator(".connection-detail h3")).toContainText(
     "A community of supporters",
   );
+});
+
+test("care images crop naturally and team portraits keep their original artwork", async ({
+  page,
+}) => {
+  for (const width of [375, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto("/");
+    await expect(page.locator(".main-cutout img")).toHaveAttribute(
+      "src",
+      "/images/children-care.png",
+    );
+    await expect(page.locator(".small-cutout img")).toHaveAttribute(
+      "src",
+      "/images/learning-care.png",
+    );
+    expect(
+      await page
+        .locator(".photo-number.single-scene-number")
+        .evaluateAll(
+          (nodes) =>
+            nodes.length > 0 &&
+            nodes.every(
+              (node) => getComputedStyle(node).backgroundSize === "cover",
+            ),
+        ),
+    ).toBe(true);
+  }
+  await page.goto("/about");
+  await expect(page.locator(".team-grid .single-scene")).toHaveCount(0);
+  expect(
+    await page
+      .locator(".team-grid .editorial-art")
+      .evaluateAll((nodes) =>
+        nodes.every((node) =>
+          getComputedStyle(node).backgroundImage.includes("kenya-stories.png"),
+        ),
+      ),
+  ).toBe(true);
 });

@@ -23,21 +23,57 @@ import {
   nextAction,
 } from "./data";
 const artwork = "/images/kenya-stories.png";
+const careScenes = {
+  children: {
+    src: "/images/children-care.png",
+    position: "50% 42%",
+    label: "Kenyan child and a caring adult sharing a joyful moment",
+  },
+  learning: {
+    src: "/images/learning-care.png",
+    position: "50% 45%",
+    label: "Kenyan children reading with a caring educator",
+  },
+  landscape: {
+    src: "/images/community-care.png",
+    position: "50% 48%",
+    label: "Children and caregivers enjoying a Kenyan community courtyard",
+  },
+};
 export function Art({ scene = "children", className = "", label }) {
+  const image = careScenes[scene];
   return (
     <div
       role="img"
-      aria-label={label || `Editorial artwork: ${scene}`}
-      className={`editorial-art art-${scene} ${className}`}
-      style={{ backgroundImage: `url(${artwork})` }}
-    />
+      aria-label={
+        label ||
+        (image
+          ? `Editorial artwork: ${image.label}`
+          : `Editorial artwork: ${scene}`)
+      }
+      className={`editorial-art art-${scene} ${image ? "single-scene" : ""} ${className}`}
+      style={image ? undefined : { backgroundImage: `url(${artwork})` }}
+    >
+      {image && (
+        <img
+          src={image.src}
+          alt=""
+          aria-hidden="true"
+          style={{ objectPosition: image.position }}
+        />
+      )}
+    </div>
   );
 }
 export function PhotoNumber({ number, scene = "children" }) {
+  const image = careScenes[scene];
   return (
     <span
-      className={`photo-number art-${scene}`}
-      style={{ backgroundImage: `url(${artwork})` }}
+      className={`photo-number art-${scene} ${image ? "single-scene-number" : ""}`}
+      style={{
+        backgroundImage: `url(${image?.src || artwork})`,
+        ...(image ? { backgroundPosition: image.position } : {}),
+      }}
       aria-hidden="true"
     >
       {number}

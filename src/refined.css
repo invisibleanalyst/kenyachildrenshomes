@@ -1660,3 +1660,70 @@ nav {
 .map-tooltip p:last-child {
   margin-bottom: 0;
 }
+
+/* Individual care scenes retain intrinsic proportions; crop rather than stretch. */
+.editorial-art.single-scene {
+  background-image: none;
+  overflow: hidden;
+}
+.editorial-art.single-scene > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+}
+.photo-number.single-scene-number {
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+/* Give the classroom scene a landscape frame so all three faces fit naturally. */
+.small-cutout {
+  width: 230px;
+  height: 180px;
+  left: -20px;
+  top: 295px;
+  border-radius: 85px;
+}
+.small-cutout > .editorial-art {
+  transform: rotate(12deg) scale(1.12);
+}
+@media (max-width: 1100px) {
+  .small-cutout {
+    width: 205px;
+    height: 165px;
+    left: -15px;
+    top: 285px;
+  }
+}
+@media (max-width: 760px) {
+  .main-cutout {
+    left: 65px;
+    width: 260px;
+    height: 330px;
+  }
+  .small-cutout {
+    left: 0;
+    width: 190px;
+    height: 145px;
+    top: 240px;
+  }
+}
+@media (max-width: 380px) {
+  .main-cutout {
+    left: 65px;
+    width: 235px;
+    height: 300px;
+  }
+  .small-cutout {
+    left: 0;
+    width: 180px;
+    height: 140px;
+    top: 230px;
+  }
+}
+/* Keep the full face composition instead of zooming inside the tilted masks. */
+.main-cutout > .editorial-art,
+.small-cutout > .editorial-art {
+  transform: none;
+}
