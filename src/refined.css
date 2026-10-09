@@ -1,0 +1,1662 @@
+/* Design 01 / refinement: editorial storytelling, larger type, softer geometry. */
+body {
+  background: #fffdf9;
+}
+p {
+  font-size: 18px;
+  line-height: 1.65;
+}
+nav {
+  font-size: 16px;
+  gap: 29px;
+}
+.button {
+  font-size: 16px;
+  border-radius: 100px;
+  padding: 18px 25px;
+}
+.nav-donate {
+  font-size: 15px;
+  border-radius: 100px;
+}
+.simple-link,
+.text-button {
+  font-size: 16px;
+}
+.prototype-note {
+  font-size: 11px;
+  line-height: 1.5;
+  padding: 9px 20px;
+}
+.hero-copy > p {
+  font-size: 21px;
+}
+.hero .simple-link {
+  font-size: 15px;
+}
+.hero-actions {
+  gap: 18px;
+}
+.hero-footnote {
+  margin-top: 30px;
+}
+.hero-collage .editorial-art {
+  height: 100%;
+  width: 100%;
+}
+.main-cutout {
+  width: 370px;
+  height: 455px;
+  left: 85px;
+  border-radius: 160px 160px 135px 135px;
+  transform: rotate(8deg);
+}
+.small-cutout {
+  width: 180px;
+  height: 225px;
+  top: 265px;
+  transform: rotate(-12deg);
+}
+.main-cutout > .editorial-art {
+  transform: rotate(-8deg) scale(1.13);
+}
+.small-cutout > .editorial-art {
+  transform: rotate(12deg) scale(1.15);
+}
+.photo-sticker {
+  border-radius: 18px;
+  font-size: 15px;
+  bottom: 35px;
+}
+.hero-star {
+  right: -10px;
+}
+.stats-strip {
+  grid-template-columns: repeat(3, 1fr);
+  padding-top: 45px;
+  padding-bottom: 45px;
+}
+.stats-strip strong {
+  font-size: 49px;
+}
+.stats-strip strong span {
+  font-size: 17px;
+}
+.stats-strip p {
+  font-size: 15px;
+}
+.intro-section p {
+  font-size: 19px;
+}
+.page-hero h1 {
+  font-size: clamp(54px, 6.3vw, 90px);
+}
+.page-hero p {
+  font-size: 21px;
+  max-width: 780px;
+}
+.page-hero {
+  padding-top: 85px;
+  padding-bottom: 65px;
+}
+.page-star {
+  font-size: 190px;
+  right: 7%;
+  color: #f4ddd7;
+}
+.project-card {
+  border-radius: 26px;
+  border: 0;
+  background: #f5f1eb;
+}
+.project-image {
+  height: 260px;
+  border-radius: 26px;
+  isolation: isolate;
+}
+.project-body {
+  padding: 28px;
+}
+.project-body h3 {
+  font-size: 30px;
+}
+.project-body p {
+  font-size: 17px;
+}
+.project-body .text-button {
+  font-size: 16px;
+}
+.status {
+  font-size: 12px;
+  padding: 7px 12px;
+  border-radius: 50px;
+}
+.project-body > .mono {
+  font-size: 10px;
+}
+.giving-banner {
+  border-radius: 65px 65px 0 0;
+  padding-top: 85px;
+  padding-bottom: 85px;
+}
+.giving-banner h2 {
+  font-size: 72px;
+}
+.giving-banner p {
+  font-size: 20px;
+}
+.giving-banner .button {
+  font-size: 16px;
+}
+.footer-main p {
+  font-size: 17px;
+}
+.footer-main > div:not(:first-child) {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.footer-bottom {
+  font-size: 11px;
+}
+.about-story p {
+  font-size: 19px;
+}
+.about-photo,
+.story-image {
+  border-radius: 160px 160px 35px 35px;
+  overflow: hidden;
+  height: 540px;
+}
+.about-story .editorial-art,
+.story-image .editorial-art {
+  height: 100%;
+}
+.values-grid h3 {
+  font-size: 29px;
+}
+.values-grid p {
+  font-size: 17px;
+}
+.values-grid {
+  gap: 35px;
+}
+.values-grid article {
+  border-radius: 24px;
+  background: #fffdf9;
+  padding: 30px;
+  border-top: 0;
+}
+.values-grid article > .mono {
+  right: 25px;
+}
+.roadmap-grid p {
+  font-size: 18px;
+}
+.roadmap-grid h3 {
+  font-size: 31px;
+}
+.roadmap-number {
+  font-size: 80px;
+}
+.chart-card {
+  border-radius: 28px;
+  padding: 35px;
+}
+.chart-card h3 {
+  font-size: 30px;
+}
+.chart-heading select {
+  font-size: 15px;
+  padding: 11px;
+}
+.bar-column {
+  font-size: 16px;
+}
+.bar-column strong {
+  font-size: 32px;
+}
+.bar {
+  border-radius: 12px 12px 0 0;
+}
+.programme-chart > div > div:first-child {
+  font-size: 16px;
+}
+.programme-chart strong {
+  font-size: 15px;
+}
+.programme-chart {
+  gap: 25px;
+}
+.bars {
+  height: 250px;
+}
+.progress {
+  height: 9px;
+}
+.chart-footnote {
+  font-size: 9px;
+  line-height: 1.7;
+}
+.project-filters input,
+.project-filters select {
+  font-size: 16px;
+  border-radius: 100px;
+  padding: 16px 22px;
+}
+.project-filters input {
+  width: 280px;
+}
+.project-filters select {
+  max-width: 260px;
+}
+.filter-tabs {
+  border-radius: 100px;
+  padding: 5px;
+}
+.filter-tabs button {
+  font-size: 15px;
+  border-radius: 100px;
+  padding: 13px 20px;
+}
+.modal {
+  border-radius: 30px;
+}
+.modal > p {
+  font-size: 18px;
+}
+.modal-stats span {
+  font-size: 16px;
+}
+.modal .close {
+  background: #efe9e0;
+  border-radius: 50%;
+  padding: 9px;
+}
+.story-tabs button {
+  width: 50px;
+  height: 50px;
+}
+.impact-story p {
+  font-size: 21px;
+}
+.donate-story h1 {
+  font-size: 70px;
+}
+.donate-story > p {
+  font-size: 20px;
+}
+.donation-photo {
+  height: 450px;
+  border-radius: 150px 150px 35px 35px;
+}
+.donation-photo > .editorial-art {
+  height: 100%;
+}
+.donation-photo > div:not(.editorial-art) {
+  bottom: 28px;
+  left: 30px;
+  right: 30px;
+}
+.donation-photo h3 {
+  font-size: 36px;
+}
+.donation-photo p {
+  font-size: 18px;
+}
+.donation-form {
+  border-radius: 30px;
+  padding: 34px;
+}
+.donation-form h2 {
+  font-size: 42px;
+}
+.donation-form > p {
+  font-size: 17px;
+}
+.frequency {
+  border-radius: 100px;
+}
+.frequency button {
+  font-size: 16px;
+  border-radius: 100px;
+  padding: 14px;
+}
+.donation-form label,
+.donation-form legend {
+  font-size: 16px;
+}
+.donation-form input {
+  font-size: 16px;
+  border-radius: 15px;
+  padding: 16px;
+}
+.donation-form .custom-amount {
+  border-radius: 15px;
+}
+.amount-grid button {
+  font-size: 16px;
+  border-radius: 16px;
+  padding: 18px;
+}
+.payment-methods button {
+  font-size: 16px;
+  border-radius: 16px;
+  padding: 17px 15px;
+}
+.moment-tabs button {
+  font-size: 16px;
+  border-radius: 100px;
+  padding: 15px;
+}
+.form-privacy {
+  font-size: 12px !important;
+}
+.payment-note {
+  font-size: 12px !important;
+}
+.donation-message p {
+  font-size: 16px;
+}
+.donation-message {
+  border-radius: 16px;
+}
+.donation-values .values-grid p {
+  font-size: 18px;
+}
+.donate-layout {
+  gap: 55px;
+}
+.input-help {
+  font-size: 12px;
+}
+.donation-submit {
+  font-size: 16px;
+}
+.map-section {
+  gap: 65px;
+  border-radius: 55px;
+  margin: 25px auto;
+  padding: 70px 6%;
+  max-width: calc(1440px - 60px);
+  width: 94%;
+}
+.map-intro h2 {
+  font-size: 46px;
+}
+.map-intro > p {
+  font-size: 18px;
+  max-width: none;
+}
+.select-label {
+  font-size: 16px;
+  margin-top: 25px;
+}
+.select-wrap select {
+  font-size: 16px;
+  border-radius: 100px;
+  padding: 17px 20px;
+}
+.select-wrap svg {
+  top: 20px;
+  right: 20px;
+}
+.county-detail {
+  border-radius: 25px;
+  padding: 27px;
+}
+.county-detail h3 {
+  font-size: 29px;
+}
+.county-detail p {
+  font-size: 16px;
+}
+.county-heading > .status {
+  font-size: 11px;
+}
+.county-numbers strong {
+  font-size: 38px;
+}
+.county-numbers span {
+  font-size: 14px;
+}
+.county-detail .text-button {
+  margin-top: 18px;
+}
+.map-canvas {
+  justify-content: center;
+  position: relative;
+}
+.map-topline {
+  font-size: 9px;
+}
+.map-drawing {
+  overflow: visible;
+  border-radius: 40px;
+  min-height: 500px;
+  background-size: 20px 20px;
+}
+.map-drawing svg {
+  max-height: 530px;
+}
+.map-drawing path.selected {
+  fill: #ed252a !important;
+  stroke: #151515 !important;
+  stroke-width: 2;
+}
+.map-drawing path:focus {
+  outline: 0;
+  stroke: #20799f !important;
+  stroke-width: 3;
+}
+.map-watermark {
+  display: none;
+}
+.map-legend {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+.map-credit {
+  font-size: 10px;
+}
+.map-controls {
+  border-radius: 100px;
+  overflow: hidden;
+}
+.map-tooltip {
+  position: absolute;
+  transform: translate(-50%, -10%);
+  width: 270px;
+  background: #fffdf9;
+  color: #191919;
+  box-shadow: 0 15px 50px #0003;
+  border-radius: 20px;
+  padding: 20px;
+  pointer-events: none;
+  z-index: 5;
+  border: 1px solid #e0d4c6;
+}
+.map-tooltip .mono {
+  font-size: 9px;
+  color: #ad2529;
+}
+.map-tooltip strong {
+  display: block;
+  font-size: 19px;
+  line-height: 1.2;
+  margin: 10px 0;
+}
+.map-tooltip p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 10px 0 0;
+  color: #5b534b;
+}
+.assessment .mono {
+  font-size: 9px;
+  color: #a52227;
+}
+.assessment p {
+  margin: 8px 0 17px;
+  font-size: 15px;
+}
+.map-projects {
+  background: #fbebe6;
+}
+.map-projects .map-intro h2 > span {
+  color: #c11d23;
+}
+.map-projects .map-canvas {
+  border: 1px solid #f1c9bf;
+  border-radius: 35px;
+  padding: 25px;
+  background: #fffaf6;
+}
+.map-projects .map-drawing {
+  background-image: none;
+}
+.heat-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+}
+.heat-legend > i {
+  display: inline-block;
+  width: 90px;
+  height: 9px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #fedfd2, #af181e);
+}
+.map-impact {
+  background: #191919;
+  color: #fffdf9;
+  border-radius: 60px;
+}
+.map-impact .map-intro h2 > span {
+  color: #f7b4a3;
+}
+.map-impact .map-intro > p {
+  color: #d3cbc1;
+}
+.map-impact .map-canvas {
+  background: #f5f0e8;
+  border-radius: 45px;
+  padding: 28px;
+  color: #191919;
+}
+.map-impact .county-detail {
+  background: #282724;
+  border-color: #45413b;
+  color: white;
+}
+.map-impact .county-detail p {
+  color: #e5d8cb;
+}
+.map-impact .county-detail .county-heading {
+  color: #f7b4a3;
+}
+.map-impact .select-wrap select {
+  background: #282724;
+  color: white;
+  border-color: #51463d;
+}
+.map-impact .map-drawing {
+  background-image: none;
+}
+.map-impact .heat-legend i {
+  background: linear-gradient(90deg, #faecdb, #232323);
+}
+.outcome-toggle {
+  display: flex;
+  gap: 7px;
+  margin: 25px 0;
+  flex-wrap: wrap;
+}
+.outcome-toggle button {
+  padding: 12px 17px;
+  border-radius: 100px;
+  border: 1px solid #5c5049;
+  font-size: 14px;
+}
+.outcome-toggle button.selected {
+  background: #f7b4a3;
+  color: #191919;
+  border-color: #f7b4a3;
+}
+.outcome-value {
+  font-size: 65px;
+  line-height: 1;
+  display: block;
+  margin-top: 22px;
+  letter-spacing: -3px;
+  font-weight: 500;
+}
+.outcome-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  border-top: 1px solid #4b443e;
+  padding-top: 20px;
+  color: #f7b4a3;
+}
+.editorial-art {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: 300% 200%;
+  min-height: 50px;
+}
+.art-children {
+  background-position: 0 0;
+}
+.art-learning {
+  background-position: 50% 0;
+}
+.art-landscape {
+  background-position: 100% 0;
+}
+.art-educator {
+  background-position: 0 100%;
+}
+.art-coordinator {
+  background-position: 50% 100%;
+}
+.art-support {
+  background-position: 100% 100%;
+}
+.photo-number {
+  display: block;
+  font-size: 230px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -20px;
+  background-size: 300% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  min-width: 285px;
+  user-select: none;
+}
+.care-process {
+  background: #f5f1eb;
+  border-radius: 60px;
+  max-width: calc(1440px - 60px);
+  width: 94%;
+  margin: 10px auto 70px;
+}
+.care-process > .section-heading > p {
+  margin: 0;
+  font-size: 19px;
+  max-width: 300px;
+}
+.process-row {
+  display: grid;
+  grid-template-columns: 300px 1fr 40px;
+  gap: 45px;
+  align-items: center;
+  border-top: 1px solid #d9d0c5;
+  padding: 38px 0;
+}
+.process-row:nth-of-type(even) {
+  grid-template-columns: 1fr 300px 40px;
+}
+.process-row:nth-of-type(even) > .photo-number {
+  grid-column: 2;
+}
+.process-row:nth-of-type(even) > div {
+  grid-column: 1;
+  grid-row: 1;
+}
+.process-row h3 {
+  font-size: 37px;
+  margin: 16px 0;
+}
+.process-row p {
+  font-size: 19px;
+  max-width: 480px;
+  margin-bottom: 0;
+}
+.process-row > .mono {
+  font-size: 9px;
+}
+.connection-section {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 50px;
+  align-items: center;
+  background: #f5f1eb;
+  border-radius: 60px;
+  max-width: calc(1440px - 60px);
+  width: 94%;
+}
+.connection-section p {
+  font-size: 19px;
+}
+.connection-tabs {
+  display: flex;
+  gap: 10px;
+  margin: 28px 0;
+}
+.connection-tabs button {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid #d0c5b9;
+  border-radius: 100px;
+  font-size: 15px;
+  padding: 13px 16px;
+}
+.connection-tabs button.selected {
+  background: #191919;
+  color: white;
+  border-color: #191919;
+}
+.connection-detail {
+  padding: 25px;
+  background: #fffdf9;
+  border-radius: 25px;
+}
+.connection-detail h3 {
+  font-size: 29px;
+  margin: 0 0 15px;
+}
+.connection-detail p {
+  font-size: 17px;
+  margin: 0;
+}
+.connection-map svg {
+  width: 100%;
+  height: auto;
+}
+.connection-route {
+  stroke: #ed252a;
+  fill: none;
+  stroke-width: 2;
+  stroke-dasharray: 6 7;
+}
+.route-country path {
+  fill: #d8c8b9;
+  stroke: #f5f1eb;
+  stroke-width: 1;
+}
+.route-country.selected path {
+  fill: #ed252a;
+}
+.route-country circle {
+  fill: #191919;
+  stroke: #fffdf9;
+  stroke-width: 4;
+}
+.connection-map text {
+  font-family: "DM Mono";
+  font-size: 12px;
+  letter-spacing: 1px;
+  fill: #64574c;
+}
+.connection-map > .mono {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+}
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 35px;
+}
+.team-grid .editorial-art {
+  aspect-ratio: 1/1;
+  height: auto;
+  border-radius: 130px 130px 30px 30px;
+  margin-bottom: 25px;
+}
+.team-grid h3 {
+  font-size: 30px;
+  margin: 13px 0;
+}
+.team-grid p {
+  font-size: 18px;
+}
+.team-note {
+  color: #867c70;
+  margin-top: 30px;
+  font-size: 9px;
+}
+.impact-dashboard {
+  background: #f6f0e8;
+  border-radius: 60px;
+  max-width: calc(1440px - 60px);
+  width: 94%;
+  margin-bottom: 30px;
+}
+.year-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 15px;
+  white-space: nowrap;
+}
+.year-picker select {
+  font-size: 18px;
+  padding: 14px 25px;
+  border-radius: 100px;
+  min-width: 130px;
+}
+.impact-outcomes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.outcome-card {
+  text-align: left;
+  background: #fffdf9;
+  border: 1px solid #e1d6c9;
+  border-radius: 30px;
+  padding: 28px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: background 0.2s;
+}
+.outcome-card > svg:first-child {
+  color: #ed252a;
+  margin-bottom: 8px;
+}
+.outcome-card > svg:last-child {
+  position: absolute;
+  right: 25px;
+  top: 30px;
+}
+.outcome-card > strong {
+  font-size: 53px;
+  letter-spacing: -2px;
+  font-weight: 600;
+}
+.outcome-card > span:last-of-type {
+  font-size: 17px;
+  line-height: 1.5;
+}
+.outcome-card.selected {
+  background: #ed252a;
+  color: white;
+  border-color: #ed252a;
+}
+.outcome-card.selected > svg {
+  color: white;
+}
+.impact-growth {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  align-items: center;
+  gap: 55px;
+  padding-top: 50px;
+}
+.impact-growth > .editorial-art {
+  height: 390px;
+  border-radius: 140px 140px 35px 35px;
+}
+.impact-growth h3 {
+  font-size: 38px;
+  margin: 18px 0;
+}
+.impact-growth p {
+  font-size: 18px;
+}
+.impact-sparkline {
+  margin-top: 20px;
+}
+.impact-sparkline svg {
+  width: 100%;
+  height: 100px;
+  overflow: visible;
+}
+.impact-sparkline > div {
+  display: flex;
+  justify-content: space-between;
+  font-family: "DM Mono";
+  font-size: 11px;
+  margin-top: 10px;
+}
+.donation-journey {
+  background: #f5f1eb;
+  border-radius: 60px;
+  max-width: calc(1440px - 60px);
+  width: 94%;
+  margin: 20px auto 70px;
+}
+.donation-journey .section-heading > p {
+  font-size: 18px;
+  max-width: 370px;
+}
+.journey-track {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  position: relative;
+  gap: 15px;
+}
+.journey-track:before {
+  content: "";
+  height: 2px;
+  background: #d7c8b9;
+  position: absolute;
+  top: 30px;
+  left: 10%;
+  right: 10%;
+}
+.journey-track > button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  text-align: center;
+  font-size: 17px;
+  padding: 0 10px;
+  line-height: 1.4;
+}
+.journey-track > button > .mono {
+  color: #867667;
+  font-size: 10px;
+}
+.journey-track > button > svg {
+  position: absolute;
+  right: -17px;
+  top: 21px;
+  color: #b6a491;
+}
+.journey-dot {
+  width: 62px;
+  height: 62px;
+  border: 1px solid #d7c8b9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fffdf9;
+  z-index: 1;
+  transition: background 0.2s;
+}
+.journey-track > button.selected .journey-dot {
+  background: #ed252a;
+  border-color: #ed252a;
+  color: white;
+}
+.journey-track > button.selected > span:last-of-type {
+  color: #bd161c;
+}
+.journey-feature {
+  display: grid;
+  grid-template-columns: 230px 1fr 240px;
+  align-items: center;
+  gap: 30px;
+  margin-top: 50px;
+  border-radius: 35px;
+  background: #fffdf9;
+  padding: 30px;
+}
+.journey-feature .photo-number {
+  font-size: 190px;
+  min-width: 220px;
+  letter-spacing: -15px;
+}
+.journey-feature h3 {
+  font-size: 34px;
+  margin: 15px 0;
+}
+.journey-feature p {
+  font-size: 18px;
+}
+.journey-feature > .editorial-art {
+  height: 240px;
+  border-radius: 50%;
+}
+.journey-note {
+  font-size: 12px;
+  color: #857869;
+  margin: 25px 0 0;
+}
+.project-dashboard {
+  padding-top: 15px;
+}
+.project-directory {
+  padding-top: 70px;
+}
+.empty-state {
+  border-radius: 25px;
+}
+.page-hero + .stats-strip {
+  display: none;
+}
+@media (max-width: 1150px) {
+  .hero-star {
+    right: -15px;
+  }
+  .main-cutout {
+    width: 290px;
+    height: 380px;
+    left: 65px;
+  }
+  .small-cutout {
+    width: 150px;
+    height: 195px;
+    top: 255px;
+  }
+  .photo-sticker {
+    left: 170px;
+    bottom: -10px;
+  }
+  .hero-collage {
+    min-height: 500px;
+  }
+  .map-section {
+    gap: 35px;
+    padding: 55px 5%;
+    width: 94%;
+  }
+  .map-intro h2 {
+    font-size: 40px;
+  }
+  .map-projects .map-canvas,
+  .map-impact .map-canvas {
+    padding: 20px;
+  }
+  .map-drawing {
+    min-height: 400px;
+  }
+  .map-legend {
+    gap: 13px;
+  }
+  .heat-legend {
+    font-size: 9px;
+  }
+  .heat-legend > i {
+    width: 50px;
+  }
+  .process-row {
+    grid-template-columns: 240px 1fr 30px;
+    gap: 25px;
+  }
+  .process-row:nth-of-type(even) {
+    grid-template-columns: 1fr 240px 30px;
+  }
+  .photo-number {
+    font-size: 190px;
+    min-width: 235px;
+  }
+  .journey-feature {
+    grid-template-columns: 190px 1fr;
+    gap: 30px;
+  }
+  .journey-feature .photo-number {
+    font-size: 165px;
+    min-width: 185px;
+  }
+  .journey-feature > .editorial-art {
+    display: none;
+  }
+  .team-grid {
+    gap: 25px;
+  }
+  .team-grid h3 {
+    font-size: 27px;
+  }
+  .outcome-card > strong {
+    font-size: 43px;
+  }
+  .outcome-card {
+    padding: 24px;
+  }
+  .connection-section {
+    gap: 35px;
+  }
+  .donate-story h1 {
+    font-size: 57px;
+  }
+  .donate-layout {
+    gap: 35px;
+  }
+  .custom-amount > .mono {
+    display: none;
+  }
+  .values-grid {
+    gap: 22px;
+  }
+  .values-grid article {
+    padding: 24px;
+  }
+  .giving-banner h2 {
+    font-size: 60px;
+  }
+  nav {
+    gap: 20px;
+    font-size: 14px;
+  }
+}
+@media (max-width: 760px) {
+  .prototype-note {
+    font-size: 9px;
+    padding: 9px 16px;
+  }
+  .hero-copy > p {
+    font-size: 19px;
+  }
+  .hero h1 {
+    font-size: clamp(64px, 14vw, 89px);
+  }
+  .hero-actions {
+    flex-direction: column;
+    align-items: start;
+  }
+  .hero .simple-link {
+    font-size: 15px;
+  }
+  .hero-collage {
+    min-height: 470px;
+    max-width: 440px;
+  }
+  .main-cutout {
+    left: 85px;
+    width: 280px;
+    height: 350px;
+    top: 0;
+  }
+  .small-cutout {
+    left: 15px;
+    width: 145px;
+    height: 195px;
+    top: 215px;
+  }
+  .photo-sticker {
+    left: 175px;
+    bottom: 30px;
+    font-size: 12px;
+  }
+  .hero-star {
+    right: 0;
+  }
+  .handwritten {
+    top: 355px;
+    right: 0;
+    font-size: 18px;
+  }
+  .hero-footnote .mono {
+    font-size: 8px;
+  }
+  .red-disc {
+    top: 45px;
+    left: 50px;
+  }
+  .stats-strip {
+    padding: 30px 6%;
+    gap: 14px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .stats-strip strong {
+    font-size: 32px;
+  }
+  .stats-strip strong span {
+    font-size: 13px;
+    display: block;
+    margin-top: 6px;
+  }
+  .stats-strip p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .intro-section p {
+    font-size: 18px;
+  }
+  .page-hero h1 {
+    font-size: 49px;
+  }
+  .page-hero p {
+    font-size: 19px;
+  }
+  .page-hero {
+    padding-top: 45px;
+    padding-bottom: 40px;
+  }
+  .page-star {
+    font-size: 120px;
+    right: -25px;
+  }
+  .map-section {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    width: 94%;
+    padding: 40px 6%;
+    border-radius: 35px;
+    margin: 20px auto;
+  }
+  .map-intro h2 {
+    font-size: 38px;
+  }
+  .map-intro > p {
+    font-size: 18px;
+  }
+  .county-detail {
+    padding: 22px;
+  }
+  .county-detail p {
+    font-size: 16px;
+  }
+  .county-detail h3 {
+    font-size: 26px;
+  }
+  .county-numbers strong {
+    font-size: 35px;
+  }
+  .county-heading > .mono {
+    font-size: 9px;
+  }
+  .map-projects .map-canvas,
+  .map-impact .map-canvas {
+    padding: 20px 14px;
+    border-radius: 28px;
+  }
+  .map-drawing {
+    min-height: 360px;
+    height: 420px;
+    padding: 12px;
+    overflow: hidden;
+  }
+  .map-drawing svg {
+    height: 100%;
+    width: 100%;
+  }
+  .map-tooltip {
+    display: none;
+  }
+  .map-legend {
+    font-size: 10px;
+    gap: 10px;
+  }
+  .map-topline {
+    font-size: 8px;
+    gap: 12px;
+  }
+  .heat-legend {
+    font-size: 10px;
+    flex-wrap: wrap;
+    max-width: 200px;
+  }
+  .heat-legend > i {
+    width: 60px;
+  }
+  .project-image {
+    height: 300px;
+  }
+  .project-body {
+    padding: 25px;
+  }
+  .project-body h3 {
+    font-size: 30px;
+  }
+  .project-body p {
+    font-size: 18px;
+  }
+  .project-body > .mono {
+    font-size: 9px;
+  }
+  .giving-banner {
+    border-radius: 35px 35px 0 0;
+    padding: 50px 6%;
+    grid-template-columns: 1fr;
+  }
+  .giving-banner h2 {
+    font-size: 48px;
+  }
+  .giving-banner p {
+    font-size: 19px;
+  }
+  .banner-art {
+    display: none;
+  }
+  .about-photo,
+  .story-image {
+    height: 390px;
+    border-radius: 130px 130px 28px 28px;
+  }
+  .about-story p {
+    font-size: 18px;
+  }
+  .values-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .values-grid article {
+    padding: 28px;
+  }
+  .values-grid h3 {
+    font-size: 28px;
+  }
+  .values-grid p {
+    font-size: 18px;
+  }
+  .roadmap-grid p {
+    font-size: 18px;
+  }
+  .roadmap-number {
+    font-size: 54px;
+  }
+  .chart-card {
+    padding: 25px;
+  }
+  .chart-card h3 {
+    font-size: 27px;
+  }
+  .chart-heading {
+    flex-direction: column;
+  }
+  .bar-column {
+    font-size: 14px;
+  }
+  .bar-column strong {
+    font-size: 27px;
+  }
+  .programme-chart > div > div:first-child {
+    font-size: 15px;
+  }
+  .programme-chart strong {
+    font-size: 13px;
+  }
+  .programme-chart {
+    gap: 25px;
+  }
+  .filter-tabs button {
+    font-size: 14px;
+    padding: 12px;
+  }
+  .project-filters input,
+  .project-filters select {
+    width: 100%;
+    max-width: none;
+  }
+  .impact-story p {
+    font-size: 19px;
+  }
+  .care-process,
+  .connection-section,
+  .impact-dashboard,
+  .donation-journey {
+    width: 94%;
+    border-radius: 35px;
+    padding: 40px 6%;
+    margin-bottom: 45px;
+  }
+  .care-process .section-heading > p {
+    font-size: 18px;
+  }
+  .process-row,
+  .process-row:nth-of-type(even) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 30px 0;
+    position: relative;
+  }
+  .process-row:nth-of-type(even) > .photo-number,
+  .process-row:nth-of-type(even) > div {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .photo-number {
+    font-size: 180px;
+    letter-spacing: -15px;
+    min-width: 0;
+    width: 255px;
+  }
+  .process-row > svg {
+    position: absolute;
+    right: 0;
+    top: 90px;
+    width: 27px;
+  }
+  .process-row h3 {
+    font-size: 32px;
+  }
+  .process-row p {
+    font-size: 18px;
+  }
+  .connection-section {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  .connection-section p {
+    font-size: 18px;
+  }
+  .connection-tabs {
+    gap: 8px;
+  }
+  .connection-tabs button {
+    font-size: 14px;
+    padding: 12px;
+  }
+  .connection-detail h3 {
+    font-size: 27px;
+  }
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .team-grid .editorial-art {
+    max-width: 400px;
+    margin: auto auto 25px;
+  }
+  .team-grid h3 {
+    font-size: 31px;
+  }
+  .team-grid p {
+    font-size: 18px;
+  }
+  .team-note {
+    font-size: 8px;
+  }
+  .impact-outcomes {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  .outcome-card {
+    padding: 25px;
+    gap: 10px;
+  }
+  .outcome-card > strong {
+    font-size: 52px;
+  }
+  .outcome-card > span:last-of-type {
+    font-size: 18px;
+  }
+  .outcome-card > svg:first-child {
+    margin: 0;
+  }
+  .impact-growth {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding-top: 35px;
+  }
+  .impact-growth > .editorial-art {
+    height: 320px;
+    border-radius: 120px 120px 30px 30px;
+  }
+  .impact-growth h3 {
+    font-size: 33px;
+  }
+  .impact-growth p {
+    font-size: 18px;
+  }
+  .year-picker {
+    flex-direction: row;
+    align-items: center;
+    font-size: 14px;
+    gap: 20px;
+  }
+  .year-picker select {
+    font-size: 16px;
+    min-width: 110px;
+  }
+  .donate-story h1 {
+    font-size: 51px;
+  }
+  .donate-story > p {
+    font-size: 19px;
+  }
+  .donation-photo {
+    height: 370px;
+    border-radius: 120px 120px 30px 30px;
+  }
+  .donation-photo h3 {
+    font-size: 32px;
+  }
+  .donation-photo p {
+    font-size: 17px;
+  }
+  .donation-photo > div:not(.editorial-art) {
+    left: 24px;
+    right: 24px;
+    bottom: 25px;
+  }
+  .donation-form {
+    padding: 26px;
+    border-radius: 28px;
+  }
+  .donation-form h2 {
+    font-size: 35px;
+  }
+  .donation-form > p {
+    font-size: 17px;
+  }
+  .frequency button {
+    font-size: 15px;
+  }
+  .amount-grid button {
+    font-size: 15px;
+  }
+  .payment-methods button {
+    font-size: 15px;
+  }
+  .moment-tabs button {
+    font-size: 15px;
+    padding: 14px;
+  }
+  .donation-journey .section-heading > p {
+    font-size: 18px;
+  }
+  .journey-track {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px 15px;
+  }
+  .journey-track:before {
+    display: none;
+  }
+  .journey-track > button {
+    font-size: 15px;
+    padding: 0 5px;
+  }
+  .journey-track > button > svg {
+    display: none;
+  }
+  .journey-dot {
+    width: 57px;
+    height: 57px;
+  }
+  .journey-feature {
+    grid-template-columns: 1fr;
+    padding: 25px;
+    gap: 20px;
+    margin-top: 30px;
+  }
+  .journey-feature .photo-number {
+    font-size: 180px;
+    width: 245px;
+  }
+  .journey-feature h3 {
+    font-size: 30px;
+  }
+  .journey-feature p {
+    font-size: 18px;
+  }
+  .journey-note {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .donation-values .values-grid p {
+    font-size: 18px;
+  }
+  .footer-main {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .footer-main > div:first-child {
+    grid-column: auto;
+  }
+  .footer-main > div:not(:first-child) {
+    font-size: 16px;
+  }
+  .footer-main p {
+    font-size: 17px;
+  }
+  .modal {
+    padding: 35px 24px;
+  }
+  .modal h2 {
+    font-size: 33px;
+  }
+  .modal > p {
+    font-size: 18px;
+  }
+  .modal-stats span {
+    font-size: 14px;
+  }
+  .select-wrap select {
+    font-size: 16px;
+  }
+  .empty-state {
+    padding: 40px 20px;
+  }
+}
+@media (max-width: 380px) {
+  .hero-collage {
+    min-height: 415px;
+  }
+  .main-cutout {
+    left: 70px;
+    width: 230px;
+    height: 300px;
+  }
+  .small-cutout {
+    left: 0;
+    top: 185px;
+    width: 130px;
+    height: 175px;
+  }
+  .red-disc {
+    left: 25px;
+    width: 270px;
+    height: 270px;
+  }
+  .photo-sticker {
+    left: 130px;
+    bottom: 5px;
+    font-size: 11px;
+  }
+  .handwritten {
+    top: 315px;
+    font-size: 16px;
+  }
+  .hero-star {
+    font-size: 55px;
+  }
+  .stats-strip p {
+    font-size: 11px;
+  }
+  .map-drawing {
+    height: 360px;
+    min-height: 330px;
+  }
+  .map-topline {
+    font-size: 7px;
+  }
+  .map-topline span:last-child {
+    display: none;
+  }
+  .county-heading {
+    flex-wrap: wrap;
+  }
+  .map-intro h2 {
+    font-size: 34px;
+  }
+  .filter-tabs button {
+    font-size: 12px;
+  }
+  .donate-story h1 {
+    font-size: 45px;
+  }
+  .payment-methods button {
+    gap: 7px;
+    padding: 15px 11px;
+  }
+  .donation-form {
+    padding: 23px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .route-traveller {
+    display: none;
+  }
+}
+.donation-photo > .editorial-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  height: 100%;
+  width: 100%;
+}
+.care-process .section-heading {
+  align-items: end;
+}
+.care-process .process-row .photo-number {
+  background-repeat: no-repeat;
+}
+.map-tooltip p:last-child {
+  margin-bottom: 0;
+}
