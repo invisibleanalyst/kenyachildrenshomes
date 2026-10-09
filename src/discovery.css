@@ -1226,13 +1226,17 @@ main:focus {
 }
 .d-giving-station {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: "form photo";
+  align-items: stretch;
   gap: 0;
   background: #efeee3;
   border-radius: 35px;
   overflow: hidden;
 }
 .d-giving-photo {
+  grid-area: photo;
+  min-width: 0;
   position: relative;
   min-height: 780px;
 }
@@ -1268,6 +1272,8 @@ main:focus {
   font-size: 9px;
 }
 .d-giving-form {
+  grid-area: form;
+  min-width: 0;
   padding: 40px 45px;
 }
 .d-form-heading {
@@ -2202,7 +2208,8 @@ main:focus {
     font-size: 12px;
   }
   .d-giving-station {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "photo" "form";
     border-radius: 25px;
   }
   .d-giving-photo {
@@ -2360,21 +2367,6 @@ main:focus {
     transition: none !important;
     animation: none !important;
     scroll-behavior: auto !important;
-  }
-}
-/* A new giving layout: form first on desktop, narrative image first on phones. */
-.d-giving-form {
-  order: 1;
-}
-.d-giving-photo {
-  order: 2;
-}
-@media (max-width: 760px) {
-  .d-giving-photo {
-    order: 1;
-  }
-  .d-giving-form {
-    order: 2;
   }
 }
 .d-skip {

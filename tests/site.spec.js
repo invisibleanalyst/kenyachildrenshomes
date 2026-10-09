@@ -203,3 +203,22 @@ test("mobile pages fit the viewport and the menu closes on navigation", async ({
   await expect(page).toHaveURL(/\/$/);
   await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
 });
+
+test('donation image and form share a desktop row and stack photo-first on mobile', async ({page}) => {
+  await page.goto('/donate');
+  for (const width of [320, 375, 760, 768, 1024, 1440]) {
+    await page.setViewportSize({width,height:1000});
+    await page.evaluate(() => document.fonts.ready);
+    const image = await page.locator('.d-giving-photo').boundingBox();
+    const form = await page.locator('.d-giving-form').boundingBox();
+    if (width > 760) {
+      expect(Math.abs(image.y-form.y)).toBeLessThan(1);
+      expect(Math.abs(image.height-form.height)).toBeLessThan(1);
+      expect(image.x).toBeGreaterThanOrEqual(form.x+form.width-1);
+    } else {
+      expect(Math.abs(image.x-form.x)).toBeLessThan(1);
+      expect(form.y).toBeGreaterThanOrEqual(image.y+image.height-1);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
