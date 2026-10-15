@@ -1727,3 +1727,227 @@ nav {
 .small-cutout > .editorial-art {
   transform: none;
 }
+
+/* Scoped content and simulation refinements; original rounded geometry remains. */
+.stats-context {
+  grid-column: 1/-1;
+  font-size: 13px;
+  color: var(--muted);
+}
+.stats-context summary,
+.evidence-note summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.stats-context p {
+  font-size: 14px;
+  max-width: 900px;
+  margin: 12px 0 0;
+}
+.stats-context a,
+.evidence-note a,
+.inline-link,
+.monthly-note a,
+.giving-alternatives a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.evidence-note {
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin: 20px 0;
+  font-size: 16px;
+}
+.evidence-note p,
+.funding-example p {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 14px 0;
+}
+.example-label {
+  font-size: 14px !important;
+  color: #8d2428;
+  line-height: 1.5;
+  border-left: 2px solid #d9a69b;
+  padding-left: 12px;
+}
+.impact-dashboard > .example-label {
+  margin: -12px 0 22px;
+}
+.impact-story .example-label {
+  max-width: 440px;
+}
+.impact-sparkline svg text {
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  fill: #66574d;
+}
+.impact-growth .evidence-note p {
+  font-size: 15px;
+}
+.programme-measure {
+  border-left: 2px solid var(--red);
+  padding-left: 14px;
+}
+.funding-example {
+  margin: 18px 0 25px;
+}
+.funding-example .progress {
+  margin: 15px 0;
+}
+.modal h3 {
+  font-size: 27px;
+  margin: 25px 0 15px;
+}
+.modal .evidence-note p {
+  font-size: 16px;
+}
+.modal .button {
+  margin-top: 8px;
+}
+.status.ongoing {
+  background: #ffe5e0;
+  color: #9e1c20;
+}
+.map-drawing path.neutral {
+  fill: #e3dbd1;
+}
+.map-drawing path.neutral:hover,
+.map-drawing path.neutral:focus {
+  fill: #e3dbd1;
+  stroke: #20799f;
+  stroke-width: 2;
+}
+.map-intro .map-context {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.map-legend {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.map-impact .map-context {
+  color: #d3cbc1;
+}
+.map-impact .map-legend {
+  color: #66574d;
+}
+.donation-form fieldset.gift-controls {
+  margin: 0;
+  min-width: 0;
+}
+.donation-form .gift-controls > .frequency {
+  margin-top: 23px;
+}
+.donation-form .gift-controls .input-help {
+  font-size: 13px;
+}
+.donation-form .payment-methods > button {
+  width: 100%;
+}
+.monthly-note {
+  font-size: 14px;
+  line-height: 1.6;
+  border-left: 2px solid #d9a69b;
+  padding-left: 12px;
+}
+.donation-form .donation-message {
+  background: #f5f1eb;
+}
+.donation-form .donation-message p {
+  color: #5b534b;
+}
+.donation-form[data-payment-state="confirmed"] .donation-message {
+  background: #eef4eb;
+}
+.simulation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+.simulation-controls .input-help {
+  width: 100%;
+}
+.simulation-controls button {
+  font-size: 15px;
+}
+.sample-confirmation {
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.sample-confirmation p {
+  font-size: 16px;
+}
+.sample-confirmation > .mono {
+  font-size: 10px;
+}
+.donation-form label.updates-choice {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  align-items: flex-start;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.donation-form .updates-choice input {
+  width: 18px !important;
+  flex: 0 0 18px;
+  margin: 3px 0;
+  accent-color: var(--red);
+}
+.interest-note {
+  font-size: 16px !important;
+}
+.giving-help {
+  margin-top: 18px;
+}
+.art-note,
+.giving-alternatives {
+  font-size: 14px !important;
+  line-height: 1.6;
+}
+.team-note {
+  font-size: 12px;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+summary:focus-visible {
+  outline: 3px solid #237f9b;
+  outline-offset: 5px;
+}
+@media (max-width: 760px) {
+  header {
+    position: relative;
+  }
+  nav.open {
+    top: 100%;
+  }
+  .stats-context {
+    font-size: 12px;
+  }
+  .map-legend {
+    font-size: 9px;
+    gap: 10px;
+  }
+  .impact-dashboard > .example-label {
+    margin-top: 0;
+  }
+  .impact-sparkline svg text {
+    font-size: 14px;
+  }
+}
+
+/* Keep example-period captions on one baseline at narrow widths. */
+.project-dashboard .bar-column > span:last-child {
+  white-space: nowrap;
+}

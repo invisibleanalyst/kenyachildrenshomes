@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowUpRight,
@@ -24,7 +24,15 @@ import "@fontsource/figtree/600.css";
 import "@fontsource/figtree/700.css";
 import "@fontsource/figtree/800.css";
 import "@fontsource/dm-mono/400.css";
-import { countyMap, projects, programmeNames, totals } from "./data";
+import {
+  projects,
+  programmeNames,
+  followUps,
+  exampleBudget,
+  cashRequired,
+  exampleLabel,
+  exampleUpdate,
+} from "./data";
 import "./style.css";
 import {
   Art,
@@ -36,6 +44,7 @@ import {
   DonationJourney,
 } from "./DesignSections";
 import "./refined.css";
+import { initialPayment, paymentReducer } from "./payment";
 const pages = {
   "/": "Home",
   "/about": "About us",
@@ -55,6 +64,12 @@ function Link({ to, children, className = "", ...props }) {
           history.pushState({}, "", to);
           window.dispatchEvent(new PopStateEvent("popstate"));
           window.scrollTo({ top: 0, behavior: "instant" });
+          if (window.location.hash)
+            requestAnimationFrame(() =>
+              document
+                .getElementById(window.location.hash.slice(1))
+                ?.scrollIntoView(),
+            );
         }
       }}
     >
@@ -94,8 +109,8 @@ function Header({ path }) {
   return (
     <>
       <div className="prototype-note">
-        PRESENTATION CONCEPT <span>·</span> Figures are unverified. Artwork is
-        created for this design. Payments are not live.
+        PRESENTATION CONCEPT <span>·</span> Published descriptions ·
+        Illustrative artwork and examples. Payments are not live.
       </div>
       <header>
         <Logo />
@@ -143,18 +158,18 @@ function Footer() {
           <Link to="/about">Our story</Link>
           <Link to="/projects">Our projects</Link>
           <Link to="/impact">Our impact</Link>
+          <Link to="/impact#reports">Reports &amp; financials</Link>
         </div>
         <div>
           <span className="mono">BE PART OF THE STORY</span>
           <Link to="/donate">
             Give a little. Change a lot. <ArrowUpRight size={16} />
           </Link>
-          <a
-            href="https://www.kenyachildrenshomes.org.uk/"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://kch.co.ke/" target="_blank" rel="noreferrer">
             Visit the organisation’s current website <ArrowUpRight size={14} />
+          </a>
+          <a href="mailto:fundraising@kch.co.ke">
+            Giving help &amp; supporter enquiries <ArrowUpRight size={14} />
           </a>
         </div>
       </div>
@@ -169,30 +184,38 @@ function Footer() {
 }
 function Stats() {
   return (
-    <section className="stats-strip" aria-label="Project overview">
+    <section className="stats-strip" aria-label="KCH published facts">
       <div>
         <strong>
-          47<span> counties</span>
+          1961<span> founded</span>
         </strong>
-        <p>A whole country of possibility</p>
+        <p>Beginning as Thomas Barnardo House</p>
       </div>
       <div>
         <strong>
-          {totals.children.toLocaleString()}
-          <span> children</span>
+          6,000+<span> cared for</span>
         </strong>
-        <p>Programme places across the portfolio</p>
+        <p>KCH’s historical published summary</p>
       </div>
       <div>
         <strong>
-          {totals.completed}
-          <span> projects</span>
+          ~400<span> supported/year</span>
         </strong>
-        <p>Projects at the delivery milestone</p>
+        <p>KCH’s published annual estimate</p>
       </div>
+      <details className="stats-context">
+        <summary>Sources &amp; time basis</summary>
+        <p>
+          From KCH’s published summary in the supplied 15 October 2026 brief.
+          Historical cutoff, annual reporting year, definitions and overlaps
+          need clarification. These figures are not added together.{" "}
+          <a href="https://kch.co.ke/about/">KCH history ↗</a>.
+        </p>
+      </details>
     </section>
   );
 }
+
 function ProjectCard({ project: p, onSelect }) {
   return (
     <article className="project-card">
@@ -216,23 +239,57 @@ function ProjectCard({ project: p, onSelect }) {
         <h3>{p.title}</h3>
         <p>{p.description}</p>
         <button className="text-button" onClick={() => onSelect(p)}>
-          Explore project <ArrowUpRight size={17} />
+          Explore programme <ArrowUpRight size={17} />
         </button>
       </div>
     </article>
   );
 }
+function FundingExample() {
+  return (
+    <div className="funding-example">
+      <p className="example-label">{exampleLabel}</p>
+      <p>
+        One support period:{" "}
+        <strong>KES {exampleBudget.required.toLocaleString()}</strong> budget;{" "}
+        <strong>KES {exampleBudget.confirmed.toLocaleString()}</strong>{" "}
+        confirmed contributions.
+      </p>
+      <div
+        className="progress"
+        role="img"
+        aria-label="KES 80,000 confirmed of KES 120,000 example budget"
+      >
+        <span
+          style={{
+            width: `${(exampleBudget.confirmed / exampleBudget.required) * 100}%`,
+          }}
+        />
+      </div>
+      <p>
+        <strong>
+          KES {cashRequired(exampleBudget).toLocaleString()} cash still required
+        </strong>
+        , of which KES {exampleBudget.pledged.toLocaleString()} is pledged.
+        Pledges are not received funds.
+      </p>
+    </div>
+  );
+}
 function ProjectDialog({ project: p, onClose }) {
   useEffect(() => {
     if (!p) return;
+    const previous = document.activeElement;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const listener = (e) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", listener);
-    const previous = document.activeElement;
     document.getElementById("close-project")?.focus();
     return () => {
       document.removeEventListener("keydown", listener);
+      document.body.style.overflow = oldOverflow;
       previous?.focus();
     };
   }, [p]);
@@ -247,7 +304,9 @@ function ProjectDialog({ project: p, onClose }) {
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => {
           if (e.key === "Tab") {
-            const nodes = [...e.currentTarget.querySelectorAll("button,a")];
+            const nodes = [
+              ...e.currentTarget.querySelectorAll("button,a,summary"),
+            ];
             if (e.shiftKey && document.activeElement === nodes[0]) {
               e.preventDefault();
               nodes.at(-1).focus();
@@ -266,30 +325,66 @@ function ProjectDialog({ project: p, onClose }) {
         >
           <X />
         </button>
-        <Eyebrow>Project · {p.county}</Eyebrow>
+        <Eyebrow>Published programme · {p.county}</Eyebrow>
         <h2 id="project-title">{p.title}</h2>
         <p>{p.description}</p>
-        <div className="modal-stats">
-          <div>
-            <strong>{p.children}</strong>
-            <span>Programme places</span>
-          </div>
-          <div>
-            <strong>{p.progress}%</strong>
-            <span>Delivery progress</span>
-          </div>
-        </div>
-        <div className="progress">
-          <span style={{ width: `${p.progress}%` }} />
-        </div>
+        <p className="programme-measure">{p.measure}</p>
         <p className="mono">
           {p.status.toUpperCase()} · {p.programme.toUpperCase()}
         </p>
-        <Button to="/donate">Support a brighter future</Button>
+        <h3>
+          {p.id === "butterfly"
+            ? "August 2025 · Butterfly camp"
+            : "Source note · 15 October 2026"}
+        </h3>
+        <p>
+          {p.update}{" "}
+          {p.updateSource && (
+            <a className="inline-link" href={p.updateSource}>
+              Read KCH’s dated account ↗
+            </a>
+          )}
+        </p>
+        {p.id === "butterfly" && (
+          <>
+            <p className="example-label">{exampleLabel}</p>
+            <p>{exampleUpdate}</p>
+            <FundingExample />
+          </>
+        )}
+        <details className="evidence-note">
+          <summary>Sources, periods &amp; example method</summary>
+          <p>
+            Based on the supplied source brief reviewed 15 October 2026. Live
+            retrieval was unavailable; this review date is not a reporting
+            period. Published claims await clarification and KCH republication
+            approval. Counts with different periods and scope are not added
+            together. <a href={p.source}>KCH programme source ↗</a>.
+          </p>
+          {p.id === "butterfly" && (
+            <p>
+              Example periods A/B/C:{" "}
+              {followUps.map((r) => `${r.completed}/${r.scheduled}`).join(", ")}{" "}
+              completed/scheduled follow-ups. Both academic and welfare checks
+              must be recorded and reviewed by a coordinator to count as
+              completed. These are fictional delivery records, not child
+              wellbeing results. Budget minus confirmed contributions is the
+              remaining cash need; pledges remain inside that need.
+            </p>
+          )}
+        </details>
+        <Button to={`/donate?programme=${p.id}`}>
+          Support a brighter future
+        </Button>
+        <p className="input-help">
+          Your programme interest is carried forward, without promising
+          restricted allocation.
+        </p>
       </section>
     </div>
   );
 }
+
 function CountyMap({ mode = "overview" }) {
   const [detail, setDetail] = useState(null);
   return (
@@ -351,7 +446,7 @@ function Home() {
             <span className="tiny-heart">
               <Heart size={15} />
             </span>
-            <span className="mono">A UK BASE. A KENYAN HEART.</span>
+            <span className="mono">ROOTED IN KENYA. BUILT ON BELONGING.</span>
           </div>
         </div>
         <div className="hero-collage">
@@ -424,14 +519,10 @@ function Home() {
             <Eyebrow>GOOD THINGS START TOGETHER</Eyebrow>
             <h2>Care in action.</h2>
           </div>
-          <Button to="/projects">Explore all projects</Button>
+          <Button to="/projects">Explore all programmes</Button>
         </div>
         <div className="project-grid">
-          {[
-            projects.find((p) => p.id === "nairobi") || projects[0],
-            projects.find((p) => p.id === "kisumu") || projects[1],
-            projects.find((p) => p.id === "mombasa") || projects[2],
-          ].map((p) => (
+          {projects.slice(0, 3).map((p) => (
             <ProjectCard key={p.id} project={p} onSelect={setDetail} />
           ))}
         </div>
@@ -462,7 +553,7 @@ function About() {
         eyebrow="THE HEART BEHIND THE WORK"
         title="Every child deserves"
         accent="somewhere to belong."
-        description="Based in the United Kingdom, with work centred in Kenya. Bringing care, community, and opportunity closer to the children who need them."
+        description="Founded in Kenya in 1961 as Thomas Barnardo House. Today, KCH emphasises education, sponsorship, reintegration and family support."
       />
       <section className="about-story section">
         <div className="about-photo">
@@ -476,14 +567,18 @@ function About() {
             on children.
           </h2>
           <p>
-            A UK base connects supporters with a purpose rooted in Kenya:
-            helping children have the care, relationships, and opportunities
-            they need to grow.
+            KCH’s published account describes Kenyan Board leadership following
+            a handover at the end of 2025, building on a history of care and
+            international partnerships.
           </p>
           <p>
-            Our vision is grounded in nurturing care, access to education,
-            healthy childhoods, and stronger family connections. A childhood
-            full of possibility begins with everyday support.
+            Education, sponsorship, reintegration and family support connect
+            today’s work.{" "}
+            <a className="inline-link" href="https://kch.co.ke/about/">
+              Read KCH’s published history ↗
+            </a>
+            . This wording uses the supplied source brief and awaits KCH
+            approval.
           </p>
         </div>
       </section>
@@ -534,14 +629,14 @@ function About() {
             ],
             [
               "Grow",
-              "Learn from outcomes and expand support where it is needed.",
+              "Review follow-up information with staff and families to guide the next response.",
             ],
           ].map(([t, d], i) => (
             <article key={t}>
               <span className="roadmap-number">0{i + 1}</span>
               <h3>{t}</h3>
               <p>{d}</p>
-              <span className="mono">A COMMUNITY-LED APPROACH</span>
+              <span className="mono">PROPOSED APPROACH</span>
             </article>
           ))}
         </div>
@@ -553,23 +648,18 @@ function About() {
   );
 }
 function Charts({ impact = false }) {
-  const [metric, setMetric] = useState("Projects");
+  const [metric, setMetric] = useState("Completed");
   const [focus, setFocus] = useState(null);
-  const groups = ["Active", "Completed", "Planned"];
-  const values = groups.map((s) => {
-    const items = projects.filter((p) => p.status === s);
-    return metric === "Projects"
-      ? items.length
-      : Math.round(items.reduce((n, p) => n + p.progress, 0) / items.length);
-  });
-  const max = Math.max(...values);
+  const groups = followUps.map((r) => `Period ${r.period}`);
+  const values = followUps.map((r) => r[metric.toLowerCase()]);
+  const max = 30;
   return (
     <section className="charts-grid">
       <article className="chart-card">
         <div className="chart-heading">
           <div>
-            <span className="mono">PROJECT DELIVERY / PORTFOLIO</span>
-            <h3>{impact ? "Support, across stages" : "The bigger picture"}</h3>
+            <span className="mono">ILLUSTRATIVE EXAMPLE — NOT KCH RESULTS</span>
+            <h3>Family follow-up</h3>
           </div>
           <select
             aria-label="Chart metric"
@@ -579,8 +669,8 @@ function Charts({ impact = false }) {
               setFocus(null);
             }}
           >
-            <option>Projects</option>
-            <option>Completion</option>
+            <option>Completed</option>
+            <option>Scheduled</option>
           </select>
         </div>
         <div className="bars">
@@ -593,11 +683,11 @@ function Charts({ impact = false }) {
               onFocus={() => setFocus(i)}
               onBlur={() => setFocus(null)}
               onClick={() => setFocus(i)}
-              aria-label={`${g}: ${values[i]} ${metric.toLowerCase()}`}
+              aria-label={`${g}: ${values[i]} ${metric.toLowerCase()} follow-ups of 30 scheduled`}
             >
               <strong>{values[i].toLocaleString()}</strong>
               <span
-                className={`bar ${g.toLowerCase()}`}
+                className={`bar ${["active", "completed", "planned"][i]}`}
                 style={{ height: `${(values[i] / max) * 145}px` }}
               />
               <span>{g}</span>
@@ -606,39 +696,47 @@ function Charts({ impact = false }) {
         </div>
         <p className="chart-footnote mono" aria-live="polite">
           {focus !== null
-            ? `${groups[focus]}: ${values[focus].toLocaleString()} ${metric.toLowerCase()}`
-            : "SELECT A BAR TO EXPLORE"}
+            ? `${groups[focus]}: ${values[focus].toLocaleString()} ${metric.toLowerCase()} follow-ups`
+            : "30 SCHEDULED FOLLOW-UPS PER EXAMPLE PERIOD"}
         </p>
       </article>
       <article className="chart-card">
-        <span className="mono">PROGRAMME DISTRIBUTION</span>
-        <h3>Many ways to make a difference.</h3>
+        <span className="mono">SAME EXAMPLE / DELIVERY, NOT WELLBEING</span>
+        <h3>Review, respond, check again.</h3>
         <div className="programme-chart">
-          {programmeNames.map((p, i) => {
-            const count = projects.filter((x) => x.programme === p).length;
-            return (
-              <div key={p}>
-                <div>
-                  <span>{p}</span>
-                  <strong>{count} projects</strong>
-                </div>
-                <div className="progress">
-                  <span
-                    style={{
-                      width: `${(count / projects.length) * 100}%`,
-                      background: ["#ed252a", "#171717", "#f18b8d", "#b4aaa3"][
-                        i
-                      ],
-                    }}
-                  />
-                </div>
+          {followUps.map((r, i) => (
+            <div key={r.period}>
+              <div>
+                <span>Period {r.period}</span>
+                <strong>
+                  {r.completed} / {r.scheduled} follow-ups
+                </strong>
               </div>
-            );
-          })}
+              <div
+                className="progress"
+                role="img"
+                aria-label={`Period ${r.period}: ${r.completed} completed of ${r.scheduled} scheduled follow-ups`}
+              >
+                <span
+                  style={{
+                    width: `${(r.completed / r.scheduled) * 100}%`,
+                    background: ["#ed252a", "#171717", "#f18b8d"][i],
+                  }}
+                />
+              </div>
+            </div>
+          ))}
         </div>
-        <p className="chart-footnote mono">
-          47 COUNTY PROJECTS / ONE CONNECTED PORTFOLIO
-        </p>
+        <details className="evidence-note">
+          <summary>Example definitions</summary>
+          <p>
+            {exampleLabel}. A follow-up is completed only when academic-progress
+            and welfare checks have both been recorded and reviewed by a
+            coordinator. Scheduled means due in that fictional period. These
+            explicit observations are not KCH records, reporting years or
+            evidence of improved child wellbeing.
+          </p>
+        </details>
       </article>
     </section>
   );
@@ -660,7 +758,7 @@ function Projects() {
         eyebrow="FROM POSSIBILITY TO PROGRESS"
         title="Real care."
         accent="Everywhere it matters."
-        description="Explore care, learning, and community projects across Kenya. Follow the delivery stages, understand local priorities, and see what comes next."
+        description="Explore KCH’s published programmes in education, family support, protection and mission sustainability. Locations and reporting periods still need clarification."
       />
       <div className="section project-dashboard">
         <Charts />
@@ -670,13 +768,13 @@ function Projects() {
         <div className="section-heading">
           <div>
             <Eyebrow>EXPLORE THE POSSIBILITIES</Eyebrow>
-            <h2>Every project. A new chapter.</h2>
+            <h2>Every programme. A new chapter.</h2>
           </div>
-          <span className="mono">{filtered.length} PROJECTS</span>
+          <span className="mono">{filtered.length} PROGRAMME RECORDS</span>
         </div>
         <div className="project-filters">
           <div className="filter-tabs" aria-label="Filter project status">
-            {["All", "Active", "Completed", "Planned"].map((s) => (
+            {["All", "Ongoing"].map((s) => (
               <button
                 key={s}
                 aria-pressed={status === s}
@@ -712,8 +810,8 @@ function Projects() {
           </div>
         ) : (
           <div className="empty-state">
-            <h3>No projects match.</h3>
-            <p>Try another county, programme, or status.</p>
+            <h3>No programmes match.</h3>
+            <p>Try another county or programme.</p>
             <button
               className="text-button"
               onClick={() => {
@@ -735,11 +833,7 @@ function Projects() {
 function Impact() {
   const [story, setStory] = useState(0);
   const stories = [
-    [
-      "The joy of discovering",
-      "A book. A question. A moment of understanding. Learning opens a world of possibilities.",
-      "learning",
-    ],
+    ["From a check to a response", exampleUpdate, "learning"],
     [
       "The comfort of belonging",
       "Everyday moments of care can help a child feel seen, supported, and at home.",
@@ -757,7 +851,7 @@ function Impact() {
         eyebrow="BEHIND EVERY NUMBER, A CHILD"
         title="More than progress."
         accent="A life of possibility."
-        description="The projects tell us what is being built. The impact asks a different question: what changes in a child’s everyday life?"
+        description="Explore published programme context and an illustrative follow-up example. Completed visits describe delivery; child wellbeing needs its own evidence."
       />
       <ImpactDashboard />
       <section className="impact-story section">
@@ -768,6 +862,11 @@ function Impact() {
           <Eyebrow>THE MOMENTS THAT MATTER</Eyebrow>
           <h2>{stories[story][0]}.</h2>
           <p>{stories[story][1]}</p>
+          <p className="example-label">
+            {story === 0
+              ? exampleLabel
+              : "Illustrative theme, not a beneficiary testimony"}
+          </p>
           <div className="story-tabs">
             {stories.map((item, i) => (
               <button
@@ -783,6 +882,29 @@ function Impact() {
           </div>
         </div>
       </section>
+      <section className="reports section" id="reports">
+        <Eyebrow>EVIDENCE &amp; QUESTIONS</Eyebrow>
+        <h2>Look a little closer.</h2>
+        <p>
+          No KCH annual report or audited financial document was supplied or
+          retrieved for this preview.
+        </p>
+        <a
+          className="text-button"
+          href="mailto:info@kch.co.ke?subject=Reports%20and%20financial%20information"
+        >
+          Request reports <ArrowUpRight size={18} />
+        </a>
+        <details className="evidence-note">
+          <summary>A question about the work?</summary>
+          <p>
+            <a href="mailto:info@kch.co.ke">Contact KCH by email</a> for
+            programme questions. Please keep personal case details and
+            confidential feedback out of public channels. This prototype does
+            not submit enquiries.
+          </p>
+        </details>
+      </section>
       <CountyMap mode="impact" />
       <GivingBanner />
     </>
@@ -791,23 +913,52 @@ function Impact() {
 function Donate() {
   const [amount, setAmount] = useState(1500);
   const [frequency, setFrequency] = useState("Once");
-  const [method, setMethod] = useState("M-Pesa");
   const [moment, setMoment] = useState(0);
-  const [message, setMessage] = useState("");
+  const [payment, dispatch] = useReducer(paymentReducer, initialPayment);
+  const [updates, setUpdates] = useState(false);
+  const interest = projects.find(
+    (p) =>
+      p.id === new URLSearchParams(window.location.search).get("programme"),
+  );
+  const pending = payment.status === "pending";
+  const confirmed = payment.status === "confirmed";
+  useEffect(() => {
+    if (!pending) return;
+    const attempt = payment.attempt;
+    const timer = setTimeout(
+      () => dispatch({ type: "result", status: "timed-out", attempt }),
+      30000,
+    );
+    return () => clearTimeout(timer);
+  }, [pending, payment.attempt]);
+  const result = (status) =>
+    dispatch({ type: "result", status, attempt: payment.attempt });
+  const messages = {
+    idle: "Ready to explore. No payment will be taken.",
+    pending:
+      "Waiting for a simulated confirmation event. No STK prompt was sent and no payment was taken.",
+    confirmed: `Local simulation confirmed for KES ${Number(amount).toLocaleString()}. No payment was taken. This is not a receipt.`,
+    cancelled:
+      "Simulation cancelled. No payment was taken. Your amount and giving intention are kept; you can retry.",
+    failed:
+      "Simulation failed. No payment was taken. Retry here or use Giving help to contact KCH.",
+    "timed-out":
+      "Simulation timed out without confirmation. No payment was taken. In a live service, check the result before retrying; this local preview can be retried safely.",
+  };
   const moments = [
     [
       "A moment to learn.",
-      "Books, curiosity, and the confidence to try something new.",
+      "Education and practical support, with family connections at the centre.",
       "learning",
     ],
     [
       "A moment to belong.",
-      "The everyday comfort of care, connection, and a welcoming space.",
+      "Family-based care, reintegration and continuing support.",
       "children",
     ],
     [
       "A moment to grow.",
-      "Healthy routines and opportunities to discover what comes next.",
+      "Follow-up helps staff understand what to review next.",
       "landscape",
     ],
   ];
@@ -846,14 +997,36 @@ function Donate() {
               </button>
             ))}
           </div>
+          <p className="art-note">
+            Illustrative artwork, not KCH beneficiaries or guaranteed giving
+            outcomes.
+          </p>
+          <details className="evidence-note">
+            <summary>What a funding need can look like</summary>
+            <FundingExample />
+          </details>
+          <p className="giving-alternatives">
+            More ways to help:{" "}
+            <a href="mailto:fundraising@kch.co.ke?subject=In-kind%20support">
+              in-kind support
+            </a>
+            ,{" "}
+            <a href="mailto:fundraising@kch.co.ke?subject=Volunteering">
+              volunteering
+            </a>{" "}
+            or{" "}
+            <a href="mailto:fundraising@kch.co.ke?subject=Partnership">
+              partnership
+            </a>
+            . Ask KCH what is currently needed.
+          </p>
         </div>
         <form
           className="donation-form"
+          data-payment-state={payment.status}
           onSubmit={(e) => {
             e.preventDefault();
-            setMessage(
-              "Thank you for exploring this giving experience. This is a preview: no payment was taken. M-Pesa and card checkout will be connected before launch.",
-            );
+            dispatch({ type: "start" });
           }}
         >
           <div className="donation-form-heading">
@@ -861,130 +1034,197 @@ function Donate() {
             <Heart size={23} />
           </div>
           <h2>Make a difference.</h2>
-          <p>Choose how you’d like to give.</p>
-          <div className="frequency" aria-label="Giving frequency">
-            {["Once", "Monthly"].map((f) => (
-              <button
-                type="button"
-                key={f}
-                className={frequency === f ? "selected" : ""}
-                aria-pressed={frequency === f}
-                onClick={() => {
-                  setFrequency(f);
-                  setMessage("");
-                }}
-              >
-                {f === "Once" ? "Give once" : "Give monthly"}
-                {f === "Monthly" && <Heart size={14} />}
-              </button>
-            ))}
-          </div>
-          <label>
-            Your gift <span className="mono">KES</span>
-          </label>
-          <div className="amount-grid">
-            {[500, 1500, 3000, 5000].map((a) => (
-              <button
-                type="button"
-                key={a}
-                className={Number(amount) === a ? "selected" : ""}
-                aria-pressed={Number(amount) === a}
-                onClick={() => {
-                  setAmount(a);
-                  setMessage("");
-                }}
-              >
-                KES {a.toLocaleString()}
-              </button>
-            ))}
-          </div>
-          <label className="custom-amount">
-            <span>KES</span>
-            <input
-              type="number"
-              min="100"
-              max="1000000"
-              required
-              aria-label="Custom donation amount in Kenyan shillings"
-              value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value);
-                setMessage("");
-              }}
-            />
-            <span className="mono">CUSTOM AMOUNT</span>
-          </label>
-          <fieldset>
-            <legend>How would you like to give?</legend>
-            <div className="payment-methods">
-              {["M-Pesa", "Card"].map((m) => (
+          <p>Explore giving with a local simulation.</p>
+          {interest && (
+            <p className="interest-note">
+              Programme interest: <strong>{interest.title}</strong>. This
+              expresses interest, without promising restricted allocation.
+            </p>
+          )}
+          <fieldset className="gift-controls" disabled={pending || confirmed}>
+            <legend className="visually-hidden">Gift intention</legend>
+            <div className="frequency" aria-label="Giving frequency">
+              {["Once", "Monthly"].map((f) => (
                 <button
                   type="button"
-                  key={m}
-                  className={method === m ? "selected" : ""}
-                  aria-pressed={method === m}
+                  key={f}
+                  className={frequency === f ? "selected" : ""}
+                  aria-pressed={frequency === f}
                   onClick={() => {
-                    setMethod(m);
-                    setMessage("");
+                    setFrequency(f);
                   }}
                 >
-                  {m === "M-Pesa" ? (
-                    <Smartphone size={19} />
-                  ) : (
-                    <CreditCard size={19} />
-                  )}
-                  <span>{m}</span>
-                  {method === m && <Check size={16} />}
+                  {f === "Once" ? "Give once" : "Give monthly"}
+                  {f === "Monthly" && <Heart size={14} />}
                 </button>
               ))}
             </div>
-          </fieldset>
-          <label htmlFor="donor-name">
-            Your name <span className="optional">(optional)</span>
-          </label>
-          <input id="donor-name" autoComplete="name" placeholder="Your name" />
-          <label htmlFor="donor-email">Email address</label>
-          <input
-            id="donor-email"
-            type="email"
-            required
-            autoComplete="email"
-            placeholder="you@example.com"
-          />
-          {method === "M-Pesa" && (
-            <>
-              <label htmlFor="donor-phone">M-Pesa phone number</label>
+            {frequency === "Monthly" && (
+              <p className="monthly-note">
+                Monthly giving is an intention/setup request. No recurring
+                mechanism has been verified; this toggle does not set up
+                billing.{" "}
+                <a href="mailto:fundraising@kch.co.ke?subject=Monthly%20giving%20enquiry">
+                  Ask KCH about monthly support ↗
+                </a>
+                .
+              </p>
+            )}
+            <label htmlFor="gift-amount">
+              Your gift <span className="mono">KES</span>
+            </label>
+            <div className="amount-grid">
+              {[500, 1500, 3000, 5000].map((a) => (
+                <button
+                  type="button"
+                  key={a}
+                  className={Number(amount) === a ? "selected" : ""}
+                  aria-pressed={Number(amount) === a}
+                  onClick={() => {
+                    setAmount(a);
+                  }}
+                >
+                  KES {a.toLocaleString()}
+                </button>
+              ))}
+            </div>
+            <label className="custom-amount">
+              <span>KES</span>
               <input
-                id="donor-phone"
-                type="tel"
+                id="gift-amount"
+                type="number"
+                min="100"
+                max="1000000"
                 required
-                pattern="(\+?254|0)[17][0-9]{8}"
-                placeholder="0712 345 678 (without spaces)"
-                autoComplete="tel"
+                aria-label="Custom donation amount in Kenyan shillings"
+                value={amount}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                }}
               />
-              <span className="input-help">
-                Use 07…, 01…, or +254… with no spaces.
-              </span>
-            </>
-          )}
-          <button className="button donation-submit" type="submit">
-            Preview KES {Number(amount || 0).toLocaleString()}{" "}
-            {frequency === "Monthly" ? "monthly gift" : "gift"}
+              <span className="mono">CUSTOM AMOUNT</span>
+            </label>
+            <fieldset>
+              <legend>How would you like to give?</legend>
+              <div className="payment-methods">
+                <button type="button" className="selected" aria-pressed="true">
+                  <Smartphone size={19} />
+                  <span>M-Pesa preview</span>
+                  <Check size={16} />
+                </button>
+              </div>
+            </fieldset>
+            <p className="input-help">
+              Local mock only. Live M-Pesa, card and PayPal availability are not
+              confirmed.
+            </p>
+            <label htmlFor="donor-name">
+              Example name <span className="optional">(optional)</span>
+            </label>
+            <input
+              id="donor-name"
+              autoComplete="off"
+              placeholder="Sample supporter — fictional details only"
+            />
+            <label htmlFor="donor-email">
+              Example email <span className="optional">(optional)</span>
+            </label>
+            <input
+              id="donor-email"
+              type="email"
+              autoComplete="off"
+              placeholder="supporter@example.com"
+            />
+          </fieldset>
+          <button
+            className="button donation-submit"
+            type="submit"
+            disabled={pending || confirmed}
+          >
+            {confirmed
+              ? "Simulation confirmed"
+              : pending
+                ? "Awaiting simulated result…"
+                : `${payment.status === "idle" ? "Preview" : "Retry"} KES ${Number(amount || 0).toLocaleString()} gift`}
             <ArrowUpRight size={18} />
           </button>
           <p className="payment-note">
             <ShieldCheck size={15} />
-            Preview only · Payment gateway not connected
+            Local preview · No payment is taken
           </p>
-          {message && (
-            <div className="donation-message" role="status">
-              <Check size={20} />
-              <p>{message}</p>
+          <div className="donation-message" role="status" aria-live="polite">
+            <p>{messages[payment.status]}</p>
+          </div>
+          {pending && (
+            <fieldset className="simulation-controls">
+              <legend>Local simulation controls</legend>
+              <p className="input-help">
+                Choose the next event. Pending also times out after 30 seconds.
+              </p>
+              {[
+                ["confirmed", "Confirm simulation"],
+                ["cancelled", "Cancel simulation"],
+                ["failed", "Simulate failure"],
+                ["timed-out", "Simulate timeout"],
+              ].map(([status, label]) => (
+                <button
+                  type="button"
+                  className="text-button"
+                  key={status}
+                  onClick={() => result(status)}
+                >
+                  {label}
+                </button>
+              ))}
+            </fieldset>
+          )}
+          {confirmed && (
+            <div className="sample-confirmation">
+              <span className="mono">
+                SAMPLE CONFIRMATION · NO PAYMENT TAKEN
+              </span>
+              <p>
+                Thank you for exploring support
+                {interest ? ` with an interest in ${interest.title}` : ""}.
+                {frequency === "Monthly"
+                  ? " Your monthly intention has not created recurring billing."
+                  : ""}
+              </p>
+              <label className="updates-choice">
+                <input
+                  type="checkbox"
+                  checked={updates}
+                  onChange={(e) => setUpdates(e.target.checked)}
+                />
+                <span>Show a sample programme update (optional).</span>
+              </label>
+              <p className="input-help">
+                This separate choice does not create a subscription or send
+                email.
+              </p>
+              {updates && (
+                <details className="sample-update evidence-note" open>
+                  <summary>Sample programme update</summary>
+                  <p className="example-label">{exampleLabel}</p>
+                  <p>{exampleUpdate}</p>
+                  <p>
+                    This shows how an approved update could appear after
+                    support. It is not actual KCH reporting or email delivery.
+                  </p>
+                </details>
+              )}
             </div>
           )}
+          <a
+            className="text-button giving-help"
+            href="mailto:fundraising@kch.co.ke"
+          >
+            Giving help · contact KCH <ArrowUpRight size={18} />
+          </a>
           <p className="form-privacy">
-            This prototype does not store or send your details. Use example
-            details to explore the form.
+            Use fictional details only. This prototype does not store or send
+            your details. Official payment instructions need KCH confirmation
+            before live use.
           </p>
         </form>
       </section>
@@ -1006,12 +1246,12 @@ function Donate() {
             [
               ShieldCheck,
               "Transparent support",
-              "Verified impact reporting and payment information will be added before launch.",
+              "Separate confirmed funds from pledges, and ask questions about programme reporting.",
             ],
             [
               Users,
               "A shared tomorrow",
-              "One gift or ongoing support: every act of care is part of a bigger story.",
+              "Money, practical assistance, volunteering and partnerships can all begin with a conversation.",
             ],
           ].map(([Icon, t, d]) => (
             <article key={t}>
@@ -1038,6 +1278,12 @@ function App() {
   useEffect(() => {
     document.title = `${pages[path] || "Page not found"} — Kenya Children’s Homes`;
     document.querySelector("main")?.focus({ preventScroll: true });
+    if (window.location.hash)
+      requestAnimationFrame(() =>
+        document
+          .getElementById(window.location.hash.slice(1))
+          ?.scrollIntoView(),
+      );
   }, [path]);
   return (
     <>

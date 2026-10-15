@@ -23,15 +23,14 @@ Browser tests use `/usr/bin/chromium` in this cloud environment. Set `CHROMIUM_P
 
 ## Content and integrations
 
-- `src/data.js` contains one fictional project for each of Kenya’s 47 counties. Totals and charts derive from the same data. Replace these examples with verified project and impact records.
-- Home uses a portfolio map; Projects uses a delivery-progress heatmap with county assessment and next actions; Impact uses outcome-intensity layers for learning, family support, and nutrition. Each county map supports hover, keyboard selection, click, and a mobile dropdown. About uses a symbolic UK–Kenya connection map.
-- Projects and Impact intentionally use separate measures: project delivery stages versus child/family wellbeing outcomes. Reporting-year controls and outcome switches are interactive. All numbers remain fictional.
-- Homepage storytelling and the donation journey use image-filled numerals. The donation journey describes a proposed four-stage process; it is not transaction tracking.
-- Team artwork represents roles, not real employees. No staff names or biographies are invented.
-- The donation page supports preset/custom KES amounts, monthly/one-off selection, M-Pesa/card selection, and client-side validation. It never stores or submits personal details or takes payment. Use example details while testing. Payment processing, recurring billing, receipts, and CMS editing are not implemented.
-- Before payment integration, verify the selected provider’s charity eligibility and support for M-Pesa, cards, and recurring donations. Do not assume Polar supplies all three.
-- Organisation history, actual programme descriptions, verified impact, approved photography, staff profiles, and final logo assets still need to be supplied. The current logo is a CSS approximation.
-- `vercel.json` rewrites application routes to `index.html` while preserving image and build asset paths. No environment variables are needed for the concept site.
+- `src/data.js` now holds six independent programme records in five public groupings. All 47 county outlines remain; only published locations in the supplied brief are mapped. Missing numeric values are null, and cumulative/current programme claims are not added.
+- Home retains its photographic 01/02/03 care approach, with shorter programme-based listening, support and follow-up copy. Projects and Impact keep their distinct rounded map treatments with factual location information, no fake progress or attendance.
+- Impact uses explicitly fictional education/family follow-up observations: 21, 24 and 27 completed of 30 scheduled in periods A/B/C. Its three warm metric tiles and delicate data-driven trend remain; no historical year multiplier or wellbeing inference remains.
+- About retains the symbolic UK–Kenya connection as a historical partnership illustration. The current organisation is described under Kenyan leadership, and portrait artwork describes roles rather than named employees.
+- The giving form demonstrates idle, pending, confirmed, cancelled, failed and timed-out states locally. It sends no request, STK prompt, charge, message or receipt, stores no personal data, and creates no subscription or recurring billing. Use fictional details only. Optional sample updates are revealed separately after confirmation. The four-step DonationJourney is proposed-process storytelling, not actual payment tracking.
+- Read `docs/kch-content-sources.md` for evidence basis, definitions, artwork status and KCH input needs. Official page retrieval was unavailable; supplied source-brief claims are not independent verification or republication approval.
+- Read `docs/design-01-refinement-review.md` and `docs/review/README.md` for component changes, checks and before/after screenshots.
+- Existing `vercel.json` rewrites application routes to `index.html`; hosting and deployment are unchanged.
 
 ## Design versions
 
@@ -39,7 +38,7 @@ Browser tests use `/usr/bin/chromium` in this cloud environment. Set `CHROMIUM_P
 - `design-01-refined`: this revision, with larger type, rounder frames, image-filled numerals, distinct map experiences, donation storytelling, and team-role portraits.
 - `main` remains the original design until a preferred version is merged.
 - With a connected Vercel project, branch deployments can provide separate browser previews. No deployment is performed by these repository changes.
-- `design-previews/` contains current screenshots for review on GitHub.
+- `design-previews/` contains the original branch’s screenshots. `docs/review/` contains this refinement’s before/after and interaction-state evidence.
 
 ## Asset sources
 

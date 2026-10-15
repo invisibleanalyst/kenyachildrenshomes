@@ -16,11 +16,9 @@ import {
 } from "lucide-react";
 import {
   countyMap,
-  projects,
-  outcomes,
-  outcomeTypes,
-  assessment,
-  nextAction,
+  programmesForCounty,
+  followUps,
+  exampleLabel,
 } from "./data";
 const artwork = "/images/kenya-stories.png";
 const careScenes = {
@@ -104,24 +102,24 @@ export function CareProcess() {
       {[
         [
           "Listen first.",
-          "Understand the child, the family, and the place they call home. Let local voices shape the next step.",
+          "Listen to children and families about education and practical needs, as in Kibera Sponsorship and Butterfly family support.",
           "landscape",
         ],
         [
           "Make room to grow.",
-          "Bring learning, wellbeing, and everyday care together. Create space for children to discover their own possibilities.",
+          "Connect education and protection through programmes such as Soila, alongside practical support for family life.",
           "learning",
         ],
         [
-          "Keep showing up.",
-          "Build lasting connections. Review what is working, support families, and keep moving forward together.",
+          "Review and follow up.",
+          "Use academic and welfare checks, as described at Butterfly camp, to ask what support and follow-up are needed next.",
           "children",
         ],
       ].map(([t, d, s], i) => (
         <article className="process-row" key={t}>
           <PhotoNumber number={`0${i + 1}`} scene={s} />
           <div>
-            <span className="mono">THE CARE JOURNEY / 0{i + 1}</span>
+            <span className="mono">PROPOSED CARE APPROACH / 0{i + 1}</span>
             <h3>{t}</h3>
             <p>{d}</p>
           </div>
@@ -135,18 +133,15 @@ export function EnhancedMap({ mode = "overview", onProject }) {
   const [selected, setSelected] = useState("nairobi");
   const [hovered, setHovered] = useState(null);
   const [zoom, setZoom] = useState(1);
-  const [metric, setMetric] = useState("learning");
+  const [programmeId, setProgrammeId] = useState("kibera");
   const [tip, setTip] = useState({ x: 50, y: 40 });
-  const county =
-    projects.find((p) => p.id === (hovered || selected)) || projects[0];
-  const outcome = outcomes.find((o) => o.id === county.id);
+  const county = countyMap.locations.find(
+    (c) => c.id === (hovered || selected),
+  );
+  const records = programmesForCounty(county.id);
+  const programme = records.find((p) => p.id === programmeId) || records[0];
   const impact = mode === "impact";
   const progress = mode === "projects";
-  const maximum = Math.max(...outcomes.map((o) => o[metric]));
-  const intensity = (p) =>
-    impact
-      ? outcomes.find((o) => o.id === p.id)[metric] / maximum
-      : p.progress / 100;
   function enter(event, c) {
     setHovered(c.id);
     const bounds = event.currentTarget
@@ -167,14 +162,19 @@ export function EnhancedMap({ mode = "overview", onProject }) {
       ),
     });
   }
+  function select(id) {
+    setSelected(id);
+    setHovered(null);
+    setProgrammeId(programmesForCounty(id)[0]?.id || "");
+  }
   return (
     <section className={`map-section map-${mode}`} id="county-map">
       <div className="map-intro">
         <Eyebrow>
           {impact
-            ? "A GEOGRAPHY OF POSSIBILITY"
+            ? "THE PLACES BEHIND THE WORK"
             : progress
-              ? "DELIVERY / COUNTY BY COUNTY"
+              ? "PROGRAMMES / PUBLISHED LOCATIONS"
               : "OUR WORK, ON THE MAP"}
         </Eyebrow>
         <h2>
@@ -186,9 +186,9 @@ export function EnhancedMap({ mode = "overview", onProject }) {
             </>
           ) : progress ? (
             <>
-              See the plan.
+              See the work.
               <br />
-              <span>Follow the progress.</span>
+              <span>Find a connection.</span>
             </>
           ) : (
             <>
@@ -199,26 +199,13 @@ export function EnhancedMap({ mode = "overview", onProject }) {
           )}
         </h2>
         <p>
-          {impact
-            ? "Explore where learning, family support, and wellbeing come together. Choose an outcome to see the reach across Kenya."
-            : progress
-              ? "From the first community conversation to the final delivery milestone. Explore current progress, local needs, and the next step in each county."
-              : "Every county has a story. Explore the places, the work underway, and the possibilities still ahead."}
+          Discover published programme locations: Kibera Sponsorship and
+          Jonathan Gloag Academy in Nairobi; Soila in Suswa, Narok.
         </p>
-        {impact && (
-          <div className="outcome-toggle" aria-label="Map outcome">
-            {Object.entries(outcomeTypes).map(([k, v]) => (
-              <button
-                key={k}
-                aria-pressed={metric === k}
-                className={metric === k ? "selected" : ""}
-                onClick={() => setMetric(k)}
-              >
-                {v.label}
-              </button>
-            ))}
-          </div>
-        )}
+        <p className="map-context">
+          County outlines show geography, not nationwide coverage. Other
+          programme locations still need clarification.
+        </p>
         <label className="select-label" htmlFor={`county-${mode}`}>
           Find a county
         </label>
@@ -226,14 +213,11 @@ export function EnhancedMap({ mode = "overview", onProject }) {
           <select
             id={`county-${mode}`}
             value={selected}
-            onChange={(e) => {
-              setSelected(e.target.value);
-              setHovered(null);
-            }}
+            onChange={(e) => select(e.target.value)}
           >
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.county}
+            {countyMap.locations.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
               </option>
             ))}
           </select>
@@ -242,53 +226,53 @@ export function EnhancedMap({ mode = "overview", onProject }) {
         <div className="county-detail" aria-live="polite">
           <div className="county-heading">
             <MapPin size={18} />
-            <span className="mono">{county.county.toUpperCase()}</span>
-            {!impact && (
-              <span className={`status ${county.status.toLowerCase()}`}>
-                {county.status}
-              </span>
-            )}
+            <span className="mono">{county.name.toUpperCase()}</span>
+            {programme && <span className="status ongoing">Ongoing</span>}
           </div>
-          {impact ? (
+          {programme ? (
             <>
-              <strong className="outcome-value">
-                {outcome[metric].toLocaleString()}
-              </strong>
-              <p>{outcomeTypes[metric].unit}</p>
-              <div className="outcome-mini">
-                <BookOpen size={19} />
-                <span>{outcome.attendance}% learning participation</span>
+              {records.length > 1 && (
+                <>
+                  <label className="select-label" htmlFor={`programme-${mode}`}>
+                    Choose a programme
+                  </label>
+                  <div className="select-wrap">
+                    <select
+                      id={`programme-${mode}`}
+                      value={programme.id}
+                      onChange={(e) => setProgrammeId(e.target.value)}
+                    >
+                      {records.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.title}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown size={18} />
+                  </div>
+                </>
+              )}
+              <h3>{programme.title}</h3>
+              <div className="assessment">
+                <span className="mono">PUBLISHED DESCRIPTION</span>
+                <p>{programme.description}</p>
+                <span className="mono">REPORTING CONTEXT</span>
+                <p>{programme.measure}</p>
               </div>
-              <p>
-                More chances to learn, stronger family connections, and everyday
-                wellbeing.
-              </p>
+              <button
+                className="text-button"
+                onClick={() => onProject(programme)}
+              >
+                View programme <ArrowUpRight size={18} />
+              </button>
             </>
           ) : (
             <>
-              <h3>{county.title}</h3>
-              <div className="assessment">
-                <span className="mono">CURRENT ASSESSMENT</span>
-                <p>{assessment(county)}</p>
-                <span className="mono">WHAT COMES NEXT</span>
-                <p>{nextAction(county)}</p>
-              </div>
-              <div className="county-numbers">
-                <div>
-                  <strong>{county.progress}%</strong>
-                  <span>delivery progress</span>
-                </div>
-                <div>
-                  <strong>{county.children}</strong>
-                  <span>programme places</span>
-                </div>
-              </div>
-              <div className="progress">
-                <span style={{ width: `${county.progress}%` }} />
-              </div>
-              <button className="text-button" onClick={() => onProject(county)}>
-                View project <ArrowUpRight size={18} />
-              </button>
+              <h3>No programme information published here</h3>
+              <p>
+                This does not mean there is no need, or that KCH does not
+                operate here.
+              </p>
             </>
           )}
         </div>
@@ -296,112 +280,84 @@ export function EnhancedMap({ mode = "overview", onProject }) {
       <div className="map-canvas">
         <div className="map-topline mono">
           <span>KENYA / 47 COUNTIES</span>
-          <span>
-            {impact
-              ? outcomeTypes[metric].label.toUpperCase()
-              : "HOVER TO EXPLORE"}
-          </span>
+          <span>PUBLISHED LOCATIONS</span>
         </div>
         <div className="map-drawing">
           <svg
             viewBox={countyMap.viewBox}
             role="group"
-            aria-label={
-              impact
-                ? "County impact intensity map"
-                : "County project progress map"
-            }
+            aria-label="County programme location map"
             style={{ transform: `scale(${zoom})` }}
           >
-            {countyMap.locations.map((c, i) => (
-              <path
-                key={c.id}
-                d={c.path}
-                tabIndex="0"
-                role="button"
-                aria-label={`${c.name}, ${projects[i].status} project`}
-                aria-pressed={selected === c.id}
-                className={`${projects[i].status.toLowerCase()} ${county.id === c.id ? "selected" : ""}`}
-                style={
-                  impact || progress
-                    ? {
-                        fill: impact
-                          ? `rgb(${Math.round(250 - intensity(projects[i]) * 215)},${Math.round(236 - intensity(projects[i]) * 201)},${Math.round(219 - intensity(projects[i]) * 184)})`
-                          : `rgb(${Math.round(254 - intensity(projects[i]) * 79)},${Math.round(224 - intensity(projects[i]) * 200)},${Math.round(210 - intensity(projects[i]) * 180)})`,
-                      }
-                    : undefined
-                }
-                onMouseEnter={(e) => enter(e, c)}
-                onMouseLeave={() => setHovered(null)}
-                onFocus={(e) => enter(e, c)}
-                onBlur={() => setHovered(null)}
-                onClick={() => {
-                  setSelected(c.id);
-                  setHovered(null);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setSelected(c.id);
-                    setHovered(null);
+            {countyMap.locations.map((c) => {
+              const known = programmesForCounty(c.id).length > 0;
+              return (
+                <path
+                  key={c.id}
+                  d={c.path}
+                  tabIndex="0"
+                  role="button"
+                  aria-label={`${c.name}, ${known ? "published programme locations" : "no published programme record"}`}
+                  aria-describedby={
+                    hovered === c.id ? `tooltip-${mode}` : undefined
                   }
-                }}
-              >
-                <title>
-                  {c.name} · {projects[i].status}
-                </title>
-              </path>
-            ))}
+                  aria-pressed={selected === c.id}
+                  className={`${known ? "active" : "neutral"} ${selected === c.id && known ? "selected" : ""}`}
+                  onMouseEnter={(e) => enter(e, c)}
+                  onMouseLeave={() => setHovered(null)}
+                  onFocus={(e) => enter(e, c)}
+                  onBlur={() => setHovered(null)}
+                  onClick={() => select(c.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      select(c.id);
+                    }
+                  }}
+                >
+                  <title>
+                    {c.name} ·{" "}
+                    {known
+                      ? "Published programme locations"
+                      : "No programme information published here"}
+                  </title>
+                </path>
+              );
+            })}
           </svg>
           {hovered && (
             <div
+              id={`tooltip-${mode}`}
               className="map-tooltip"
               role="tooltip"
               style={{ left: `${tip.x}%`, top: `${tip.y}%` }}
             >
-              <span className="mono">{county.county.toUpperCase()}</span>
+              <span className="mono">{county.name.toUpperCase()}</span>
               <strong>
-                {impact
-                  ? `${outcome[metric].toLocaleString()} ${outcomeTypes[metric].unit}`
-                  : county.title}
+                {records.length
+                  ? records.map((p) => p.title).join(" · ")
+                  : "No programme information published here"}
               </strong>
               <p>
-                {impact
-                  ? `${outcome.attendance}% learning participation · family-led support`
-                  : assessment(county)}
+                {records.length
+                  ? "Published county-level locations; coverage and reporting periods need clarification."
+                  : "This is an information gap, not a statement about need or KCH activity."}
               </p>
-              {!impact && (
-                <p>
-                  <b>Next:</b> {nextAction(county)}
-                </p>
-              )}
             </div>
           )}
           <span className="map-watermark">KENYA</span>
         </div>
         <div className="map-bottom">
-          {impact || progress ? (
-            <div className="heat-legend">
-              <span>{impact ? "Lower reach" : "Getting started"}</span>
-              <i />
-              <span>{impact ? "Higher reach" : "Delivered"}</span>
-            </div>
-          ) : (
-            <div className="map-legend mono">
-              <span>
-                <i className="active-dot" />
-                Active
-              </span>
-              <span>
-                <i className="complete-dot" />
-                Completed
-              </span>
-              <span>
-                <i className="planned-dot" />
-                Planned
-              </span>
-            </div>
-          )}
+          <div className="map-legend mono">
+            <span>
+              <i className="active-dot" />
+              Published location
+            </span>
+            <span>
+              <i className="planned-dot" />
+              No published record
+            </span>
+          </div>
           <div className="map-controls">
             <button
               disabled={zoom === 1}
@@ -411,33 +367,38 @@ export function EnhancedMap({ mode = "overview", onProject }) {
               <Minus size={16} />
             </button>
             <button
-              aria-label="Zoom in map"
               disabled={zoom >= 1.4}
+              aria-label="Zoom in map"
               onClick={() => setZoom(Math.min(1.4, zoom + 0.2))}
             >
               <Plus size={16} />
             </button>
           </div>
         </div>
-        <p className="map-credit">Map: SVG Maps / Mihai Ro · CC BY 4.0</p>
+        <p className="map-credit">
+          Map: SVG Maps / Mihai Ro · CC BY 4.0. County locations, never
+          individual addresses.
+        </p>
       </div>
     </section>
   );
 }
+
 export function ConnectionMap() {
   const [focus, setFocus] = useState("kenya");
   return (
     <section className="connection-section section">
       <div>
-        <Eyebrow>CONNECTED BY CARE</Eyebrow>
+        <Eyebrow>HISTORICAL CONNECTIONS</Eyebrow>
         <h2>
           Two places.
           <br />
           <span className="red">One shared purpose.</span>
         </h2>
         <p>
-          A UK base. A Kenyan heart. Connecting supporters with the communities
-          where care happens.
+          KCH’s story includes historical UK partnerships. Its published account
+          now describes Kenyan Board leadership following handover at the end of
+          2025.
         </p>
         <div className="connection-tabs">
           {[
@@ -458,13 +419,13 @@ export function ConnectionMap() {
         <div className="connection-detail" aria-live="polite">
           <h3>
             {focus === "uk"
-              ? "A community of supporters."
+              ? "A historical partnership."
               : "Care, close to home."}
           </h3>
           <p>
             {focus === "uk"
-              ? "Fundraising, communication, and partnerships connect people who want to help with a shared purpose."
-              : "Local relationships bring care, learning, and family support into the places children know best."}
+              ? "This symbolic illustration recalls UK connections in KCH’s history. It does not show a verified current support structure or funding route."
+              : "Founded in 1961 as Thomas Barnardo House, KCH now emphasises education, sponsorship, reintegration and family support under Kenyan leadership."}
           </p>
         </div>
       </div>
@@ -472,7 +433,7 @@ export function ConnectionMap() {
         <svg
           viewBox="0 0 700 460"
           role="img"
-          aria-label="A symbolic connection from the United Kingdom to Kenya"
+          aria-label="A symbolic historical UK–Kenya partnership, not a current operating structure"
         >
           <defs>
             <pattern
@@ -523,7 +484,9 @@ export function ConnectionMap() {
             />
           </circle>
         </svg>
-        <span className="mono">SUPPORT WITHOUT BORDERS</span>
+        <span className="mono">
+          HISTORICAL PARTNERSHIP · SYMBOLIC ILLUSTRATION
+        </span>
       </div>
     </section>
   );
@@ -531,7 +494,7 @@ export function ConnectionMap() {
 export function TeamSection() {
   return (
     <section className="team-section section">
-      <Eyebrow>THE PEOPLE BEHIND THE PURPOSE</Eyebrow>
+      <Eyebrow>THE ROLES BEHIND THE WORK</Eyebrow>
       <div className="section-heading">
         <h2>
           Different backgrounds.
@@ -540,7 +503,7 @@ export function TeamSection() {
         <p>
           Local knowledge. Open hearts.
           <br />
-          Connections that cross borders.
+          Role illustrations, not staff profiles.
         </p>
       </div>
       <div className="team-grid">
@@ -548,20 +511,20 @@ export function TeamSection() {
           [
             "educator",
             "Community & care",
-            "Kenya",
+            "Illustrative role",
             "Care teams work alongside children and families, listening to everyday needs and building relationships that last.",
           ],
           [
             "coordinator",
             "Programmes & partnerships",
-            "Kenya",
+            "Illustrative role",
             "Local coordination connects education, wellbeing, and practical support with community knowledge.",
           ],
           [
             "support",
             "Supporter relations",
-            "United Kingdom",
-            "The UK support function brings together fundraising, partnerships, and clear communication with donors.",
+            "Illustrative role",
+            "Supporter communication can turn approved programme information into clear updates. This is a role explanation, not a verified current post.",
           ],
         ].map(([scene, t, place, d]) => (
           <article key={scene}>
@@ -576,19 +539,39 @@ export function TeamSection() {
         ))}
       </div>
       <p className="team-note mono">
-        ROLE PORTRAITS · EDITORIAL ARTWORK · STAFF PROFILES TO BE CONFIRMED
+        ILLUSTRATIVE ROLES · EDITORIAL ARTWORK, NOT KCH STAFF · APPROVED
+        PROFILES NOT SUPPLIED
       </p>
     </section>
   );
 }
 export function ImpactDashboard() {
-  const [metric, setMetric] = useState("learning");
-  const [year, setYear] = useState("2026");
-  const factor = { 2024: 0.62, 2025: 0.81, 2026: 1 }[year];
-  const values = Object.keys(outcomeTypes).map((k) =>
-    Math.round(outcomes.reduce((n, o) => n + o[k], 0) * factor),
-  );
-  const total = values[Object.keys(outcomeTypes).indexOf(metric)];
+  const [period, setPeriod] = useState("C");
+  const [metric, setMetric] = useState("completed");
+  const observation = followUps.find((r) => r.period === period);
+  const definitions = {
+    scheduled: { label: "Scheduled", unit: "follow-ups due", icon: BookOpen },
+    completed: { label: "Completed", unit: "follow-ups reviewed", icon: Heart },
+    rate: {
+      label: "Completion",
+      unit: "of scheduled follow-ups",
+      icon: Sprout,
+    },
+  };
+  const value = (record, key) =>
+    key === "rate"
+      ? Math.round((record.completed / record.scheduled) * 100)
+      : record[key];
+  // A common zero baseline keeps the 21/24/27 observations in proportion.
+  const scaleMax = Math.max(...followUps.map((r) => r.scheduled));
+  const points = followUps.map((r, i) => ({
+    x: 10 + i * (435 / (followUps.length - 1)),
+    y: 100 - (r.completed / scaleMax) * 88,
+    record: r,
+  }));
+  const path = points
+    .map((p, i) => `${i === 0 ? "M" : "L"}${p.x} ${p.y}`)
+    .join(" ");
   return (
     <section className="impact-dashboard section">
       <div className="section-heading">
@@ -601,102 +584,132 @@ export function ImpactDashboard() {
           </h2>
         </div>
         <label className="year-picker">
-          Reporting year
+          Example period
           <select
-            aria-label="Impact reporting year"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
+            aria-label="Example follow-up period"
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
           >
-            <option>2024</option>
-            <option>2025</option>
-            <option>2026</option>
+            {followUps.map((r) => (
+              <option key={r.period}>{r.period}</option>
+            ))}
           </select>
         </label>
       </div>
+      <p className="example-label">
+        {exampleLabel} · Education &amp; family follow-up
+      </p>
       <div className="impact-outcomes">
-        {Object.entries(outcomeTypes).map(([k, v], i) => {
-          const Icon = [BookOpen, Heart, Sprout][i];
-          return (
+        {Object.entries(definitions).map(
+          ([key, { label, unit, icon: Icon }]) => (
             <button
-              key={k}
-              className={`outcome-card ${metric === k ? "selected" : ""}`}
-              aria-pressed={metric === k}
-              onClick={() => setMetric(k)}
+              key={key}
+              className={`outcome-card ${metric === key ? "selected" : ""}`}
+              aria-pressed={metric === key}
+              onClick={() => setMetric(key)}
             >
               <Icon size={31} />
-              <span className="mono">{v.label.toUpperCase()}</span>
-              <strong>{values[i].toLocaleString()}</strong>
-              <span>{v.unit}</span>
+              <span className="mono">
+                {label.toUpperCase()} / {period}
+              </span>
+              <strong>
+                {value(observation, key)}
+                {key === "rate" ? "%" : ""}
+              </strong>
+              <span>{unit}</span>
               <ArrowUpRight size={22} />
             </button>
-          );
-        })}
+          ),
+        )}
       </div>
       <div className="impact-growth">
         <Art
           scene={
-            metric === "learning"
-              ? "learning"
-              : metric === "families"
+            metric === "scheduled"
+              ? "landscape"
+              : metric === "rate"
                 ? "children"
-                : "landscape"
+                : "learning"
           }
         />
         <div>
-          <Eyebrow>
-            {outcomeTypes[metric].label.toUpperCase()} / {year}
-          </Eyebrow>
+          <Eyebrow>EDUCATION &amp; FAMILY FOLLOW-UP / {period}</Eyebrow>
           <h3>
-            {metric === "learning"
-              ? "More room for curiosity."
-              : metric === "families"
-                ? "Stronger roots. Greater belonging."
-                : "Everyday wellbeing. A stronger start."}
+            Review, respond,
+            <br />
+            check again.
           </h3>
           <p>
-            {metric === "learning"
-              ? "Learning is more than a classroom. It is the confidence to ask a question, the joy of understanding, and the freedom to imagine a different future."
-              : metric === "families"
-                ? "A stable family connection can change the rhythm of a child’s life. Practical guidance and consistent care help turn support into belonging."
-                : "Good food and healthy routines make room for growing, playing, and discovering. Wellbeing is part of the everyday foundation of childhood."}
+            {metric === "scheduled"
+              ? `${observation.scheduled} follow-ups were scheduled in example period ${period}. Scheduled means a visit was due during that support period.`
+              : metric === "completed"
+                ? `${observation.completed} of ${observation.scheduled} scheduled follow-ups were completed in example period ${period}. A completed follow-up has both academic-progress and welfare checks recorded and reviewed by a coordinator.`
+                : `${value(observation, "rate")}% completion in example period ${period}: ${observation.completed} completed divided by ${observation.scheduled} scheduled follow-ups.`}{" "}
+            These fictional records show follow-up delivery, not improved child
+            wellbeing.
           </p>
           <div
             className="impact-sparkline"
             role="img"
-            aria-label={`${outcomeTypes[metric].label} reach for 2024, 2025, 2026: ${[0.62, 0.81, 1].map((f) => Math.round((total / factor) * f).toLocaleString()).join(", ")}`}
+            aria-label={`Illustrative follow-up delivery, not KCH results: ${followUps.map((r) => `period ${r.period}, ${r.completed} completed of ${r.scheduled} scheduled follow-ups`).join("; ")}. Zero to ${scaleMax} follow-up scale.`}
           >
-            <svg viewBox="0 0 460 120">
-              <path
-                d="M10 100 C100 90 135 76 230 58 S355 35 445 12"
-                fill="none"
-                stroke="#ed252a"
-                strokeWidth="4"
-              />
-              {[
-                [10, 100],
-                [230, 58],
-                [445, 12],
-              ].map(([x, y], i) => (
-                <circle
-                  cx={x}
-                  cy={y}
-                  r={Number(year) === 2024 + i ? 7 : 4}
-                  fill="#ed252a"
-                  key={i}
-                />
+            <svg viewBox="0 0 460 120" aria-hidden="true">
+              <path d={path} fill="none" stroke="#ed252a" strokeWidth="2" />
+              {points.map(({ x, y, record: r }) => (
+                <g key={r.period}>
+                  <circle
+                    cx={x}
+                    cy={y}
+                    r={period === r.period ? 5 : 3}
+                    fill="#ed252a"
+                  />
+                  <text
+                    x={x}
+                    y={y - 10}
+                    textAnchor={
+                      r.period === "A"
+                        ? "start"
+                        : r.period === "C"
+                          ? "end"
+                          : "middle"
+                    }
+                  >
+                    {r.completed} / {r.scheduled}
+                  </text>
+                </g>
               ))}
             </svg>
             <div>
-              <span>2024</span>
-              <span>2025</span>
-              <span>2026</span>
+              {followUps.map((r) => (
+                <span key={r.period}>Period {r.period}</span>
+              ))}
             </div>
           </div>
+          <details className="evidence-note">
+            <summary>Example definitions &amp; source context</summary>
+            <p>
+              {exampleLabel}. Periods A, B and C are comparable fictional
+              support periods, not KCH reporting years. Completion requires both
+              academic-progress and welfare checks to be recorded and reviewed
+              by a coordinator. The line shows explicit completed counts against
+              30 scheduled per period; its vertical scale begins at zero. No
+              historical multiplier is used.
+            </p>
+            <p>
+              Inspired by KCH’s{" "}
+              <a href="https://kch.co.ke/news/butterfly-childrens-camp/">
+                August 2025 Butterfly camp account
+              </a>
+              , which describes checks but provides no comparable outcome series
+              here.
+            </p>
+          </details>
         </div>
       </div>
     </section>
   );
 }
+
 export function DonationJourney() {
   const [step, setStep] = useState(0);
   const steps = [
@@ -708,19 +721,19 @@ export function DonationJourney() {
     ],
     [
       "A confirmed payment.",
-      "A payment provider processes the gift and confirms receipt. The future checkout will support M-Pesa and cards.",
+      "A verified provider would need to confirm a payment before it is recorded. Here, confirmation is a local simulation; no payment is taken.",
       "support",
       ShieldCheck,
     ],
     [
       "Support takes shape.",
-      "The charity assigns available funds to programme priorities, with local needs guiding the plan.",
+      "KCH would review available funds against programme priorities. Programme interest is distinct from restricted allocation; pledges are not received cash.",
       "coordinator",
       Users,
     ],
     [
-      "Care reaches everyday life.",
-      "Local teams turn programme resources into learning materials, family support, nutrition, and moments of belonging.",
+      "Care, review and update.",
+      "Support would be delivered, then reviewed through programme follow-up. One approved input could inform both the programme summary and an optional supporter update. See the clearly labelled sample after mock confirmation.",
       "learning",
       BookOpen,
     ],
@@ -758,7 +771,7 @@ export function DonationJourney() {
                   "You give",
                   "Payment confirmed",
                   "Resources assigned",
-                  "Care delivered",
+                  "Care & review",
                 ][i]
               }
             </span>
@@ -783,8 +796,10 @@ export function DonationJourney() {
         <Art scene={steps[step][2]} />
       </div>
       <p className="journey-note">
-        This describes a proposed giving process, not a tracked payment.
-        Programme allocation and provider fees will be confirmed before launch.
+        This describes a proposed giving process, not a tracked payment. No live
+        provider, recurring billing, allocation or update delivery is
+        implemented. The track illustrates a proposed process, not actual
+        payment progress.
       </p>
     </section>
   );
