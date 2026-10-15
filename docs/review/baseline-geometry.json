@@ -1,0 +1,132 @@
+[
+  {
+    "width": 320,
+    "route": "/",
+    "stamp": [
+      {
+        "width": 174,
+        "height": 76,
+        "font": "48px",
+        "padding": "14px 17px"
+      }
+    ],
+    "hero": 1034.8125
+  },
+  {
+    "width": 320,
+    "route": "/donate",
+    "stamp": [
+      {
+        "width": 137,
+        "height": 76,
+        "font": "48px",
+        "padding": "14px 17px"
+      }
+    ],
+    "hero": 928.71875
+  },
+  {
+    "width": 375,
+    "route": "/",
+    "stamp": [
+      {
+        "width": 174,
+        "height": 76,
+        "font": "48px",
+        "padding": "14px 17px"
+      }
+    ],
+    "hero": 1034.8125
+  },
+  {
+    "width": 375,
+    "route": "/donate",
+    "stamp": [
+      {
+        "width": 137,
+        "height": 76,
+        "font": "48px",
+        "padding": "14px 17px"
+      }
+    ],
+    "hero": 896.421875
+  },
+  {
+    "width": 768,
+    "route": "/",
+    "stamp": [
+      {
+        "width": 202,
+        "height": 97,
+        "font": "63px",
+        "padding": "17px 22px"
+      }
+    ],
+    "hero": 798.71875
+  },
+  {
+    "width": 768,
+    "route": "/donate",
+    "stamp": [
+      {
+        "width": 172,
+        "height": 97,
+        "font": "63px",
+        "padding": "17px 22px"
+      }
+    ],
+    "hero": 650
+  },
+  {
+    "width": 1024,
+    "route": "/",
+    "stamp": [
+      {
+        "width": 202,
+        "height": 97,
+        "font": "63px",
+        "padding": "17px 22px"
+      }
+    ],
+    "hero": 720
+  },
+  {
+    "width": 1024,
+    "route": "/donate",
+    "stamp": [
+      {
+        "width": 172,
+        "height": 97,
+        "font": "63px",
+        "padding": "17px 22px"
+      }
+    ],
+    "hero": 650
+  },
+  {
+    "width": 1440,
+    "route": "/",
+    "stamp": [
+      {
+        "width": 202,
+        "height": 97,
+        "font": "63px",
+        "padding": "17px 22px"
+      }
+    ],
+    "hero": 765.03125
+  },
+  {
+    "width": 1440,
+    "route": "/donate",
+    "stamp": [
+      {
+        "width": 172,
+        "height": 97,
+        "font": "63px",
+        "padding": "17px 22px"
+      }
+    ],
+    "hero": 650
+  }
+]

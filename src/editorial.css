@@ -953,3 +953,345 @@ h3 {
     font-size: 41px;
   }
 }
+
+/* Scoped factual copy and simulations; the original editorial geometry remains. */
+.e-hero-stamp.e-established-stamp {
+  width: 202px;
+  height: 97px;
+  gap: 10px;
+}
+.e-established-stamp strong {
+  font-size: 43px;
+  letter-spacing: -2px;
+  flex: 0 0 auto;
+}
+.e-established-stamp span {
+  font-size: 8px;
+  letter-spacing: 0.5px;
+}
+.e-hero-stamp.e-kenyan-stamp {
+  width: 172px;
+  height: 97px;
+}
+.e-kenyan-stamp span {
+  letter-spacing: 0.5px;
+}
+.e-waffle {
+  grid-template-columns: repeat(6, 1fr);
+}
+.e-waffle > span.completed,
+.e-waffle > span.chosen.completed {
+  background: #ed252a;
+}
+.e-waffle > span.outstanding {
+  background: #fffdf9;
+  border: 2px solid #171717;
+}
+.e-waffle > span.chosen {
+  box-shadow: inset 0 0 0 2px #171717;
+}
+.e-waffle > span.chosen.outstanding {
+  outline: 2px solid #ed252a;
+  outline-offset: 2px;
+}
+.e-waffle-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px !important;
+  margin: 20px 0 0;
+}
+.e-waffle-legend > span {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.e-waffle-legend i {
+  height: 12px;
+  width: 12px;
+  display: inline-block;
+  background: #ed252a;
+}
+.e-waffle-legend .outstanding {
+  background: #fffdf9;
+  border: 2px solid #171717;
+}
+.d-evidence-note,
+.e-evidence-note {
+  margin: 20px 0;
+  border-top: 1px solid #d7c6b8;
+  padding-top: 15px;
+  font-size: 15px;
+}
+.d-evidence-note summary,
+.e-evidence-note summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+.d-evidence-note p,
+.e-evidence-note p,
+.d-funding-example p {
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 14px 0;
+}
+.d-evidence-note a,
+.e-evidence-note a,
+.d-inline-link,
+.d-source-line a,
+.d-monthly-note a,
+.d-other-support a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.d-example-label,
+.e-example-label {
+  font-size: 14px !important;
+  line-height: 1.5;
+  color: #a91c22;
+  border-left: 2px solid #ed252a;
+  padding-left: 12px;
+}
+.d-outcome-river > .e-example-label {
+  margin: -15px 0 25px;
+}
+.d-funding-bar {
+  height: 7px;
+  background: #eaded2;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.d-funding-bar > span {
+  display: block;
+  height: 100%;
+  background: #ed252a;
+}
+.d-programme-measure {
+  border-left: 2px solid #ed252a;
+  padding-left: 12px;
+}
+.d-modal .d-evidence-note p {
+  font-size: 15px;
+}
+.d-modal .d-cta {
+  margin-top: 10px;
+}
+.d-modal .d-input-hint {
+  display: block;
+  margin-top: 15px;
+}
+.d-atlas-county-paths path.neutral {
+  fill: #fffdf9;
+}
+.d-atlas-story .d-select + .d-label {
+  margin-top: 15px;
+}
+.d-art-note {
+  font-size: 12px !important;
+  line-height: 1.5;
+  color: #6a584c !important;
+}
+.d-atlas-key {
+  flex-wrap: wrap;
+}
+.d-atlas-toolbar > .d-label {
+  color: #5c493e;
+}
+.e-bar-caption {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #eee0d5;
+}
+.e-impact-chart .e-evidence-note {
+  color: #f9ede4;
+  border-color: #79665a;
+}
+.e-impact-chart .e-evidence-note p {
+  color: #eee0d5;
+}
+.e-impact-chart .e-scale-label {
+  font-size: 11px;
+  fill: #e0cfc4;
+}
+.d-journal-row {
+  grid-template-columns: 35px minmax(0, 1fr) 100px minmax(120px, 0.4fr) 24px;
+}
+.d-row-descriptor {
+  font-size: 13px;
+  color: #6a584c;
+}
+.d-stage.ongoing {
+  color: #a91c22;
+  border-color: #c8a69b;
+}
+.d-giving-form fieldset.d-gift-controls {
+  margin: 0;
+  min-width: 0;
+}
+.d-gift-controls > .d-gift-frequency {
+  margin-top: 25px;
+}
+.d-payment-options > button {
+  width: 100%;
+}
+.d-gift-controls .d-input-hint {
+  line-height: 1.6;
+}
+.d-monthly-note,
+.d-interest-note {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.d-monthly-note {
+  border-left: 2px solid #c5a693;
+  padding-left: 12px;
+}
+.d-simulation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.d-simulation-controls .d-input-hint {
+  width: 100%;
+}
+.d-simulation-controls button {
+  font-size: 14px;
+}
+.d-giving-help {
+  margin-top: 14px;
+}
+.d-sample-confirmation {
+  border-top: 1px solid #d7c6b8;
+  padding-top: 22px;
+  margin-top: 22px;
+}
+.d-sample-confirmation p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.d-gift-message {
+  background: #f3e1d6;
+  color: #4b2c27;
+}
+.d-giving-form label.d-update-choice {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 12px;
+  line-height: 1.5;
+}
+.d-giving-form .d-update-choice input {
+  width: 18px;
+  flex: 0 0 18px;
+  padding: 0;
+  margin: 3px 0;
+  accent-color: #ed252a;
+}
+.d-update-choice > span {
+  font-size: 15px !important;
+}
+.d-other-support {
+  padding-top: 0;
+  padding-bottom: 25px;
+  font-size: 15px;
+}
+.d-giving-form:focus {
+  outline: 0;
+}
+.d-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+summary:focus-visible {
+  outline: 3px solid #237f9b;
+  outline-offset: 5px;
+}
+.d-footer-links > .e-footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.d-image-caption {
+  background: #171717ef;
+  color: #fffdf9;
+}
+.d-giving-photo .d-label {
+  background: #171717ed;
+  color: #fffdf9;
+  padding: 5px 8px;
+  border-radius: 4px;
+}
+@media (max-width: 760px) {
+  .e-hero-stamp.e-established-stamp {
+    width: 174px;
+    height: 76px;
+    padding: 14px 17px;
+    gap: 9px;
+  }
+  .e-established-stamp strong {
+    font-size: 36px;
+  }
+  .e-established-stamp span {
+    font-size: 7px;
+  }
+  .e-hero-stamp.e-kenyan-stamp {
+    width: 137px;
+    height: 76px;
+    padding: 14px 17px;
+    gap: 10px;
+  }
+  .e-kenyan-stamp strong {
+    font-size: 43px;
+  }
+  .e-kenyan-stamp span {
+    font-size: 7px;
+  }
+  .d-journal-row {
+    grid-template-columns: 25px minmax(0, 1fr) 24px;
+  }
+  .d-row-descriptor {
+    grid-column: 2;
+    font-size: 12px;
+  }
+  .d-journal-row > .d-stage {
+    grid-column: 2;
+  }
+  .d-journal-row > svg {
+    grid-column: 3;
+    grid-row: 1/4;
+  }
+  .d-river-years {
+    gap: 10px;
+  }
+  .d-river-years button > span {
+    font-size: 16px;
+  }
+  .d-atlas-toolbar > .d-label {
+    display: block;
+    font-size: 9px;
+  }
+  .d-outcome-river > .e-example-label {
+    margin-top: 0;
+  }
+  .e-waffle-legend {
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .e-impact-chart .d-river-visual text {
+    font-size: 26px;
+  }
+  .e-impact-chart .d-river-visual .e-scale-label {
+    font-size: 22px;
+  }
+}

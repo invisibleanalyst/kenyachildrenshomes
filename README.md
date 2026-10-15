@@ -28,7 +28,7 @@ npm run build
 npm test
 ```
 
-The Playwright runner starts Vite if needed and uses `/usr/bin/chromium`. Set `CHROMIUM_PATH` on another machine. Tests cover five routes, image/font loading, all 47 counties, keyboard navigation, atlas layers, project filtering, project waffle-chart controls, outcome/year controls, story chapters, giving themes, donation preview, the UK–Kenya story connection, and mobile overflow at 320px and 375px.
+The Playwright runner starts Vite if needed and uses `/usr/bin/chromium`. Set `CHROMIUM_PATH` on another machine. Tests cover five routes, image/font loading, all 47 counties, keyboard navigation, sparse atlas coverage, programme filtering, defined follow-up tiles, explicit period/bar controls, story chapters, giving themes, donation preview, the UK–Kenya story connection, and mobile overflow at 320px and 375px.
 
 ## Vercel preview
 
@@ -36,13 +36,14 @@ Connect this GitHub repository to Vercel and deploy `design-03` as a Preview bra
 
 ## Content and payment boundaries
 
-- Projects and outcomes in `src/data.js` are fictional presentation content. Verify and replace figures, geography, programme claims, and reporting records before publication.
-- The atlas uses authentic county geometry, decorative route connections, and computed bounding-box centres. Dots and routes are not verified service locations. Layer controls alter emphasis without removing keyboard access to any county.
-- The 47-cell waffle chart uses project status counts; outcome bars and yearly figures derive from the presentation dataset. Projects describe delivery stages, while Impact reports outcomes.
-- The UK–Kenya connection is symbolic. Team images represent roles, not actual employees; biographies and identities are not invented.
-- The giving-theme selector explores themes and does not earmark funds. The form validates locally, does not transmit personal details, and never takes payment. The gift route is a proposed process, not transaction tracking.
-- M-Pesa/card processing, recurring billing, receipts, CMS editing, verified financial reporting, and actual donation allocation are not implemented. Verify provider compatibility before integration.
-- Actual photography, final logo assets, staff profiles, and verified organisational copy still need approval. The header retains a compact presentation notice.
+- `src/data.js` contains six source-brief programme records in five public groupings, separate county geometry/lookups, null missing numbers and explicit fictional follow-up observations. Cumulative/current claims are not added.
+- Atlas keeps 47 accessible outlines but marks only published Nairobi/Narok locations. County centres are not exact programme sites. Unknown coverage is explicit; invented network routes are removed.
+- The delivery board has 30 example scheduled follow-ups: 27 completed and three outstanding. Impact retains black/red editorial bars with A/B/C counts 21/24/27, a zero baseline and maximum 30. Hatching means earlier example periods, not audit/provisional status. No fabricated reporting years or KCH outcome totals remain.
+- Home’s stamp reads 1961 / ESTABLISHED; compact stamps read KE / KENYAN-LED. Care/Learn/Grow remains an emotional bridge. The UK–Kenya graphic is historical context; portrait artwork explains roles, not actual staff.
+- Giving themes/programme interest do not promise earmarking. Local mock states demonstrate pending confirmation, cancellation/failure/timeout recovery and optional sample updates. No payment, STK prompt, personal-data submission/storage, receipt, email, subscription or recurring billing occurs. Use fictional details only.
+- The Kenya-mask hero offers a jump to the form; the four-step black journey remains proposed-process storytelling, separate from mock payment state.
+- Read `docs/design-03-refinement-review.md` for exact changes/checks; `docs/kch-content-sources.md` for evidence/artwork status and KCH publication needs; and `docs/review/README.md` for before/after and interaction-state images.
+- The active entry point remains EditorialApp. DiscoveryApp, DesignSections, inherited discovery.css, original artwork and deployment configuration are unchanged.
 
 ## Image and map sources
 
