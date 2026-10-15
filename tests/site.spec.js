@@ -1,39 +1,238 @@
-import {test,expect} from '@playwright/test';
-test('five pages render, photos and fonts load, and routes support browser history',async({page})=>{
- const errors=[];page.on('pageerror',e=>errors.push(e.message));
- for(const path of ['/','/about','/projects','/impact','/donate']){
-  await page.goto(path);await expect(page.locator('h1')).toBeVisible();await page.evaluate(()=>document.fonts.ready);
-  await page.locator('img').evaluateAll(imgs=>imgs.forEach(i=>i.loading='eager'));
-  await expect.poll(()=>page.locator('img').evaluateAll(imgs=>imgs.every(i=>i.complete&&i.naturalWidth>0))).toBe(true);
-  expect(await page.evaluate(()=>document.fonts.check('16px Figtree')&&document.fonts.check('16px "DM Mono"'))).toBe(true);
- }
- await page.getByRole('link',{name:'Projects',exact:true}).click();await expect(page).toHaveURL(/\/projects$/);await page.goBack();await expect(page).toHaveURL(/\/donate$/);expect(errors).toEqual([]);
+import { test, expect } from "@playwright/test";
+const routes = [
+  "/",
+  "/about",
+  "/projects",
+  "/impact",
+  "/donate",
+  "/feedback",
+  "/staff",
+];
+async function assignAction(page) {
+  await page
+    .getByRole("button", { name: "Review programme evidence", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Identify materials and travel need" })
+    .click();
+  await page
+    .getByRole("button", { name: "Assign programme action", exact: true })
+    .click();
+}
+test("all public and staff routes render, images/fonts load and history works", async ({
+  page,
+}) => {
+  const errors = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  for (const path of routes) {
+    await page.goto(path);
+    await expect(page.locator("h1")).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    await expect
+      .poll(() =>
+        page
+          .locator("img")
+          .evaluateAll((xs) =>
+            xs.every((x) => x.complete && x.naturalWidth > 0),
+          ),
+      )
+      .toBe(true);
+    expect(
+      await page.evaluate(() => document.fonts.check("16px Figtree")),
+    ).toBe(true);
+  }
+  await page.getByRole("link", { name: "Projects", exact: true }).click();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/staff$/);
+  expect(errors).toEqual([]);
 });
-test('all 47 counties are interactive through map, keyboard and selector',async({page})=>{
- await page.goto('/');await expect(page.locator('.map-drawing path')).toHaveCount(47);
- await page.getByLabel('Find a county').selectOption({label:'Mombasa'});await expect(page.locator('.county-heading')).toContainText('MOMBASA');
- const path=page.getByRole('button',{name:'Turkana, Active sample project'});await path.focus();await path.press('Enter');await expect(path).toHaveAttribute('aria-pressed','true');await expect(page.locator('.county-heading')).toContainText('TURKANA');
- await page.getByRole('button',{name:'View sample project'}).click();await expect(page.getByRole('dialog')).toContainText('Turkana');await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);
+test("complete scenario separates evidence, funding, operational result and public approval", async ({
+  page,
+}) => {
+  await page.goto("/staff");
+  await expect(
+    page.getByRole("button", { name: "Assign programme action", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Approve public summary" }),
+  ).toBeDisabled();
+  await assignAction(page);
+  await page
+    .getByRole("button", { name: "Assign and record follow-up" })
+    .click();
+  await page
+    .getByRole("button", { name: "Close enquiry", exact: true })
+    .click();
+  await page
+    .getByRole("button", {
+      name: "Record separate KES 30,000 confirmed contribution",
+    })
+    .click();
+  const funding = page.getByLabel("Programme funding");
+  await expect(funding).toContainText("KES 90,000");
+  await expect(funding).toContainText("KES 30,000");
+  await expect(
+    page.getByText("Review result: Not recorded.", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Approve public summary" }),
+  ).toBeDisabled();
+  await page
+    .getByRole("button", { name: "Match payment to Room to learn" })
+    .click();
+  await expect(funding).toContainText("KES 95,000");
+  await expect(funding).toContainText("KES 25,000");
+  await page.getByLabel("Simulated review result").selectOption("delivered");
+  await page.getByRole("button", { name: "Record operational review" }).click();
+  await page.goto("/");
+  await expect(page.locator(".approved-update")).not.toContainText("32 of 40");
+  await page.goto("/staff");
+  await page.getByRole("button", { name: "Approve public summary" }).click();
+  await page.goto("/");
+  await expect(page.locator(".approved-update")).toContainText("32 of 40");
+  await page.goto("/impact");
+  await page.getByLabel("Reporting period").selectOption("review");
+  await expect(page.locator(".attendance-chart")).toContainText(
+    "32 / 40 (80%)",
+  );
+  await expect(page.locator(".attendance-chart")).toContainText(
+    "24 / 40 (60%)",
+  );
+  await page.goto("/staff");
+  await page.getByRole("button", { name: "Reset fictional scenario" }).click();
+  await expect(page.getByLabel("Programme funding")).toContainText(
+    "KES 60,000",
+  );
+  await page.goto("/");
+  await expect(page.locator(".approved-update")).not.toContainText("32 of 40");
 });
-test('project filters and empty state derive from sample data',async({page})=>{
- await page.goto('/projects');await expect(page.locator('.project-directory .project-card')).toHaveCount(47);
- await page.getByRole('button',{name:'Completed',exact:true}).click();await expect(page.locator('.project-directory .project-card')).toHaveCount(16);
- await page.getByLabel('Search projects or counties').fill('no-such-county');await expect(page.getByText('No sample projects match.')).toBeVisible();await page.getByRole('button',{name:'Reset filters'}).click();await page.getByLabel('Search projects or counties').fill('Nairobi');await expect(page.locator('.project-directory .project-card')).toHaveCount(1);
- await page.locator('.project-directory').getByRole('button',{name:'Explore project'}).click();await expect(page.getByRole('dialog')).toContainText('Nairobi');
+test("delayed operational review never publishes a successful result or an October chart", async ({
+  page,
+}) => {
+  await page.goto("/staff");
+  await assignAction(page);
+  await page.getByLabel("Simulated review result").selectOption("delayed");
+  await page.getByRole("button", { name: "Record operational review" }).click();
+  await page.getByRole("button", { name: "Approve public summary" }).click();
+  await page.goto("/");
+  await expect(page.locator(".approved-update")).toContainText(
+    "Delivery has been delayed",
+  );
+  await expect(page.locator(".programme-summary")).not.toContainText(
+    "32 of 40",
+  );
+  await page.goto("/impact");
+  await expect(
+    page.locator('#reporting-period option[value="review"]'),
+  ).toBeDisabled();
+  await expect(page.locator(".attendance-chart")).not.toContainText("32 / 40");
 });
-test('chart selector changes values and story controls change the displayed story',async({page})=>{
- await page.goto('/impact');const before=await page.locator('.bar-column strong').allTextContents();await page.getByLabel('Chart metric').selectOption('Children');const after=await page.locator('.bar-column strong').allTextContents();expect(after).not.toEqual(before);
- await page.getByRole('button',{name:'Read The comfort of belonging'}).click();await expect(page.locator('.impact-story h2')).toContainText('The comfort of belonging');
+test("giving handles pending, failed, cancelled and confirmed without transmitting personal information", async ({
+  page,
+}) => {
+  const posts = [];
+  page.on("request", (r) => {
+    if (r.method() === "POST") posts.push(r.url());
+  });
+  await page.goto("/donate");
+  await page.getByLabel("Amount in KES").fill("99");
+  await page.getByRole("button", { name: "Start simulated gift" }).click();
+  await expect(page.getByRole("status")).toHaveCount(0);
+  await page.getByLabel("Amount in KES").fill("3000");
+  await page.getByLabel("Frequency", { exact: true }).selectOption("Monthly");
+  await page.getByLabel("Payment method (simulated)").selectOption("Card");
+  await page
+    .getByLabel("Show optional approved programme updates", { exact: false })
+    .check();
+  for (const status of ["failed", "cancelled", "confirmed"]) {
+    await page.getByRole("button", { name: "Start simulated gift" }).click();
+    await expect(page.getByRole("status")).toContainText("Payment pending");
+    await expect(page.getByLabel("Programme funding")).toContainText(
+      "KES 60,000",
+    );
+    await page
+      .getByRole("button", { name: `Simulate ${status}`, exact: true })
+      .click();
+    await expect(page.getByRole("status")).toContainText(`Payment ${status}`);
+  }
+  await expect(page.getByRole("status")).toContainText("DEMO-GIFT-3");
+  await expect(page.getByLabel("Programme funding")).toContainText(
+    "KES 63,000",
+  );
+  expect(posts).toEqual([]);
+  await expect(page.locator("input[type=email],input[type=tel]")).toHaveCount(
+    0,
+  );
+  await page.goto("/staff");
+  await expect(
+    page.getByText("Repeat supporters / identified appeal supporters"),
+  ).toHaveCount(1);
+  await page.getByLabel("Payment status filter").selectOption("pending");
+  await expect(page.locator("tbody tr")).toHaveCount(1);
 });
-test('donation form validates and explicitly avoids charging or transmitting details',async({page})=>{
- const sent=[];page.on('request',r=>{if(r.method()==='POST')sent.push(r.url())});await page.goto('/donate');
- await page.getByRole('button',{name:'Give monthly'}).click();await page.getByRole('button',{name:'KES 3,000',exact:true}).click();await page.getByRole('button',{name:'Card',exact:true}).click();await expect(page.getByLabel('M-Pesa phone number')).toHaveCount(0);
- await page.getByLabel('Email address').fill('example@example.com');await page.getByRole('button',{name:'Preview KES 3,000 monthly gift'}).click();await expect(page.getByRole('status')).toContainText('no payment was taken');expect(sent).toEqual([]);
- await page.getByRole('button',{name:'M-Pesa',exact:true}).click();await page.getByLabel('M-Pesa phone number').fill('0712345678');await page.getByRole('button',{name:'Preview KES 3,000 monthly gift'}).click();await expect(page.getByRole('status')).toContainText('no payment was taken');
+test("sample supporter feedback stays private and can be assigned, answered and closed", async ({
+  page,
+}) => {
+  await page.goto("/feedback");
+  await page
+    .getByLabel("Demonstration question")
+    .selectOption("Where can I find approved programme updates?");
+  await page.getByRole("button", { name: "Submit sample question" }).click();
+  await expect(page.getByRole("status")).toContainText(
+    "added to the staff queue",
+  );
+  await page.goto("/staff");
+  const q = page.locator("article").filter({
+    has: page.getByRole("heading", { name: "ENQ-002", exact: true }),
+  });
+  await expect(q).toContainText("Unassigned");
+  await expect(
+    q.getByRole("button", { name: "Close enquiry", exact: true }),
+  ).toBeDisabled();
+  await q.getByRole("button", { name: "Assign and record follow-up" }).click();
+  await expect(q).toContainText("Status: addressed");
+  await q.getByRole("button", { name: "Close enquiry", exact: true }).click();
+  await expect(q).toContainText("Status: closed");
+  await expect(q).toContainText("None linked");
+  await page.goto("/");
+  await expect(page.locator("main")).not.toContainText(
+    "Where can I find approved programme updates?",
+  );
 });
-test('mobile pages have no horizontal overflow and navigation opens',async({page})=>{
- await page.setViewportSize({width:375,height:812});
- for(const path of ['/','/about','/projects','/impact','/donate']){await page.goto(path);await page.evaluate(()=>document.fonts.ready);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true)}
- await page.getByRole('button',{name:'Open menu'}).click();await page.getByRole('link',{name:'Home',exact:true}).click();await expect(page).toHaveURL(/\/$/);await expect(page.getByRole('button',{name:'Open menu'})).toBeVisible();
- await page.screenshot({path:'/tmp/kch-mobile.png',fullPage:true});
+test("programme filter, mobile layout and keyboard navigation", async ({
+  page,
+}) => {
+  await page.goto("/projects");
+  await page.getByLabel("Find a demonstration programme").fill("unknown");
+  await expect(
+    page.getByRole("heading", { name: "No demonstration programmes match." }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Reset filters" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Where this story sits." }),
+  ).toBeVisible();
+  for (const width of [320, 375, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const path of routes) {
+      await page.goto(path);
+      await page.evaluate(() => document.fonts.ready);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+        `${path} at ${width}px`,
+      ).toBe(true);
+    }
+  }
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  await expect(
+    page.getByRole("link", { name: "Skip to content" }),
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("main")).toBeFocused();
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await page.getByRole("link", { name: "Projects", exact: true }).click();
+  await expect(page).toHaveURL(/\/projects$/);
 });
