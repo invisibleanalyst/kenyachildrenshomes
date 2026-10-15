@@ -27,7 +27,7 @@ npm run build
 npm test
 ```
 
-The Playwright runner starts Vite if needed and uses `/usr/bin/chromium`. Set `CHROMIUM_PATH` on another machine. Tests cover five routes, image/font loading, all 47 counties, keyboard navigation, atlas layers, project filtering, delivery-ring controls, outcome/year controls, story chapters, giving themes, donation preview, the UK–Kenya story connection, and mobile overflow at 320px and 375px.
+The Playwright runner starts Vite if needed and uses `/usr/bin/chromium`. Set `CHROMIUM_PATH` on another machine. Tests cover five routes, image/font loading, all 47 counties, keyboard navigation, sparse atlas coverage, programme filtering, defined delivery-ring controls, explicit example-period controls, story chapters, giving themes, donation preview, the UK–Kenya story connection, and mobile overflow at 320px and 375px.
 
 ## Vercel preview
 
@@ -35,13 +35,14 @@ Connect this GitHub repository to Vercel and deploy `design-02` as a Preview bra
 
 ## Content and payment boundaries
 
-- Projects and outcomes in `src/data.js` are fictional presentation content. Verify and replace figures, geography, programme claims, and reporting records before publication.
-- The atlas uses authentic county geometry, decorative route connections, and computed bounding-box centres. Dots and routes are not verified service locations. Layer controls alter emphasis without removing keyboard access to any county.
-- Ring segments use the project status counts; outcome totals and yearly figures derive from the presentation dataset. Flowing ribbons are a narrative visual rather than a quantitative stacked chart.
-- The UK–Kenya connection is symbolic. Team images represent roles, not actual employees; biographies and identities are not invented.
-- The giving-theme selector explores themes and does not earmark funds. The form validates locally, does not transmit personal details, and never takes payment. The gift route is a proposed process, not transaction tracking.
-- M-Pesa/card processing, recurring billing, receipts, CMS editing, verified financial reporting, and actual donation allocation are not implemented. Verify provider compatibility before integration.
-- Actual photography, final logo assets, staff profiles, and verified organisational copy still need approval. The header retains a compact presentation notice.
+- `src/data.js` holds six source-brief programme records in five public groupings, independent of county geometry. Missing numbers are null, and cumulative/current claims are not added.
+- Atlas retains all 47 accessible county outlines but marks only published Nairobi/Narok locations. County-centre markers are not exact sites; invented network routes are removed. Unknown coverage is explicit.
+- The delivery ring and single-line river use the labelled fictional follow-up example: 21/24/27 completed of 30 scheduled in A/B/C; period C is 90% completion. These are delivery examples, not KCH results or child wellbeing outcomes. No fabricated reporting years remain.
+- The UK–Kenya graphic describes a historical partnership, not a current UK base. Role portraits remain illustrations, not actual staff profiles.
+- Giving themes and programme interest do not promise restricted allocation. The form uses a local mock with idle/pending/confirmed/cancelled/failed/timed-out states. It sends no payment, STK prompt, receipt, email or personal data, creates no subscription and performs no recurring billing. Use fictional details only.
+- The scenic giving hero includes a jump to the form. The large-number journey describes a proposed process, separate from local payment states. Optional sample updates appear after mock confirmation.
+- Read `docs/kch-content-sources.md` for sources, definitions, artwork provenance and KCH publication needs. Official pages remained inaccessible; content uses the supplied brief.
+- Read `docs/design-02-refinement-review.md` and `docs/review/README.md` for exact changes, verification and before/after evidence. Original `design-previews/` files remain untouched.
 
 ## Image and map sources
 

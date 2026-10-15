@@ -2384,3 +2384,254 @@ main:focus {
   padding: 12px;
   clip-path: none;
 }
+
+/* Scoped evidence and local simulation details; scenic geometry stays intact. */
+.d-evidence-note {
+  margin: 20px 0;
+  border-top: 1px solid #c7d0bb;
+  padding-top: 15px;
+  font-size: 15px;
+}
+.d-evidence-note summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+.d-evidence-note p,
+.d-funding-example p {
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 14px 0;
+}
+.d-evidence-note a,
+.d-inline-link,
+.d-source-line a,
+.d-monthly-note a,
+.d-other-support a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.d-example-label {
+  font-size: 14px !important;
+  line-height: 1.5;
+  color: #8d3328;
+  border-left: 2px solid #b9392d;
+  padding-left: 12px;
+}
+.d-outcome-river > .d-example-label {
+  margin: -15px 0 25px;
+}
+.d-funding-bar {
+  height: 7px;
+  background: #d9dfcc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.d-funding-bar > span {
+  display: block;
+  height: 100%;
+  background: #b9392d;
+}
+.d-programme-measure {
+  border-left: 2px solid var(--red);
+  padding-left: 12px;
+}
+.d-modal .d-evidence-note p {
+  font-size: 15px;
+}
+.d-modal .d-cta {
+  margin-top: 10px;
+}
+.d-modal .d-input-hint {
+  display: block;
+  margin-top: 15px;
+}
+.d-atlas-county-paths path.neutral {
+  fill: #dde1d1;
+}
+.d-atlas-story .d-select + .d-label {
+  margin-top: 15px;
+}
+.d-art-note {
+  font-size: 12px !important;
+  line-height: 1.5;
+  color: #596852 !important;
+}
+.d-atlas-key {
+  flex-wrap: wrap;
+}
+.d-atlas-toolbar > .d-label {
+  color: #445642;
+}
+.d-river-visual svg text {
+  font-family: "DM Mono", monospace;
+  font-size: 14px;
+  fill: #4e5d48;
+}
+.d-river-visual > .d-river-caption {
+  margin: 0 0 16px;
+}
+.d-journal-row {
+  grid-template-columns: 35px minmax(0, 1fr) 100px minmax(120px, 0.4fr) 24px;
+}
+.d-row-descriptor {
+  font-size: 13px;
+  color: #56664d;
+}
+.d-stage.ongoing {
+  color: #31563c;
+  border-color: #91aa90;
+}
+.d-giving-form fieldset.d-gift-controls {
+  margin: 0;
+  min-width: 0;
+}
+.d-gift-controls > .d-gift-frequency {
+  margin-top: 25px;
+}
+.d-payment-options > button {
+  width: 100%;
+}
+.d-gift-controls .d-input-hint {
+  line-height: 1.6;
+}
+.d-monthly-note,
+.d-interest-note {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.d-monthly-note {
+  border-left: 2px solid #bda58c;
+  padding-left: 12px;
+}
+.d-simulation-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+}
+.d-simulation-controls .d-input-hint {
+  width: 100%;
+}
+.d-simulation-controls button {
+  font-size: 14px;
+}
+.d-giving-help {
+  margin-top: 14px;
+}
+.d-sample-confirmation {
+  border-top: 1px solid #c7d0bb;
+  padding-top: 22px;
+  margin-top: 22px;
+}
+.d-sample-confirmation p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.d-giving-form label.d-update-choice {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 12px;
+  line-height: 1.5;
+}
+.d-giving-form .d-update-choice input {
+  width: 18px;
+  flex: 0 0 18px;
+  margin: 3px 0;
+  accent-color: #243b32;
+}
+.d-update-choice > span {
+  font-size: 15px !important;
+}
+.d-other-support {
+  padding-top: 0;
+  padding-bottom: 25px;
+  font-size: 15px;
+}
+.d-giving-form:focus {
+  outline: 0;
+}
+.d-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+summary:focus-visible {
+  outline: 3px solid #237f9b;
+  outline-offset: 5px;
+}
+/* Photo captions use opaque green backing for contrast without changing crops. */
+.d-image-caption {
+  color: #fffdf6;
+  background: #192e25ed;
+  padding: 7px 11px;
+}
+.d-hero .d-label,
+.d-hero-coordinate .d-label {
+  color: #fffdf6;
+  text-shadow: 0 1px 4px #10251d;
+}
+.d-giving-photo .d-label {
+  color: #fffdf6;
+  background: #192e25ed;
+  padding: 5px 8px;
+  border-radius: 4px;
+}
+.d-photo-invitation .d-label {
+  color: #fffdf6;
+  text-shadow: 0 1px 5px #10251d;
+}
+@media (max-width: 760px) {
+  .d-journal-row {
+    grid-template-columns: 25px minmax(0, 1fr) 24px;
+  }
+  .d-row-descriptor {
+    grid-column: 2;
+    font-size: 12px;
+  }
+  .d-journal-row > .d-stage {
+    grid-column: 2;
+  }
+  .d-journal-row > svg {
+    grid-column: 3;
+    grid-row: 1/4;
+  }
+  .d-river-years {
+    gap: 10px;
+  }
+  .d-river-years button > span {
+    font-size: 16px;
+  }
+  .d-river-visual svg text {
+    font-size: 18px;
+  }
+  .d-image-caption {
+    font-size: 9px;
+  }
+  .d-atlas-toolbar > .d-label {
+    display: block;
+    font-size: 9px;
+  }
+  .d-outcome-river > .d-example-label {
+    margin-top: 0;
+  }
+}
+
+.d-footer-links > .d-footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.d-giving-form .d-update-choice input {
+  padding: 0;
+}
+
+@media(max-width:380px){.d-giving-shortcut{margin-top:15px}}

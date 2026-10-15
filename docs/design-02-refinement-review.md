@@ -1,0 +1,52 @@
+# Design 02 — cinematic fundraising refinement
+
+Prepared 15 October 2026. Local feature branch `surgical/design-02-fundraising`, created directly from `design-02` at `c019275fa0ec60e8a36476016f5929b7a22858a6`. The GitHub connector confirmed that source tip before implementation. The working tree was clean. Original branches and user work were preserved. No push, merge or deployment is part of this task.
+
+## Exact component changes
+
+| Component | What changed | What remains |
+| --- | --- | --- |
+| Entry point / active scope | Main application remains DiscoveryApp. Changes apply to `src/DiscoveryApp.jsx`, `src/discovery.css`, `src/data.js` and the local payment reducer | `src/main.jsx`, inactive `DesignSections.jsx`, `refined.css`, other design apps, image assets, packages and hosting configuration are untouched |
+| Hero / Home | Short supporting copy now describes education, sponsorship, reintegration, family support and published Kenyan Board leadership after end-2025 handover. UK-base claim removed | Landscape artwork, sunset light, full hero heights, dark-green overlays, photographic crops, poetic headings, coordinates, original wave path and transitions |
+| ChapterStories | Existing first selected chapter carries KCH’s August 2025 Butterfly camp activity, with source link and programme-context giving CTA. Other chapters use JGA and Soila context. The article is not relabelled 2026. Impact’s first chapter uses the shared fictional evidence/response/review account, clearly labelled, plus a funding expansion | Large organic photographic scene, poetic titles, chapter controls, image/text composition and generous editorial spacing |
+| Atlas | Six independent programme records, county lookup and a Nairobi programme selector. Only Nairobi/Narok have coverage markers; no invented network routes. All 47 outlines and dropdown options remain, with explicit information gaps elsewhere. A pin identifies county selection, separate from coverage. Cards show sourced descriptors, not progress/attendance values | Large map scale, contour backdrop, compass, pin, hatched published counties, photographic side card, layer-style pill controls repurposed for published county locations |
+| ProjectDialog | Programme description and reporting context, dated update/source note, expandable sources/method, Butterfly example/funding bar, programme interest carried into giving without earmarking. Focus trap/restore, Escape and scroll lock | Existing rounded detail shell, typography and pill CTA |
+| DeliveryChart | Ring represents fictional period C: 27 of 30 scheduled follow-ups completed (90%), explicitly labelled. Completed/Scheduled controls explain the defined measure. It never means an ongoing programme is 90% finished | Ring radius 100 in original 260×260 viewbox, 21px active stroke, colours, three-part layout and surrounding editorial treatment |
+| Programme journal | Replaced 47 generated projects with six records across five public groupings. All/Ongoing and search retained. Fake percentage bars replaced by sourced establishment years or nonnumeric continuing-support descriptors. Unknown numeric counts stay null in the data | Thin journal lines, row hierarchy, status pills and directory position; record count is a directory count, not an impact statistic |
+| OutcomeRiver | One line positioned from explicit completed counts 21/24/27 on a fixed 0–30 scale, with one subtle gradient area down to zero. Values/units, point labels and accessible summary supplied. A/B/C replace fabricated reporting years. Left controls show completed, scheduled and completion context; line remains explicitly labelled completed counts. Details define periods/completion and explain that shading is neither uncertainty nor forecast | Flowing curved character, original green/cream chart panel, typography, controls and editorial pacing. No multiple undefined ribbons or historical multipliers |
+| Impact / evidence access | Existing image/story block holds fictional review: possible transport issue, programme coordinator response, later observed completion and next review. Association is explicit, with no wellbeing/causal claim. Narrow funding expansion separates received money from pledges. Reports area offers a request rather than inventing downloads/audit status | Large imagery, chapter hierarchy, original reflection and scenic ending; no administrative KPI-card rows |
+| Donate / form | Scenic hero now has a visible, keyboard-friendly jump to form. Existing themes and form/photo balance remain. Mock states: idle, pending, confirmed, cancelled, failed, timed-out. 30-second automatic timeout. Confirmation requires a separate event, repeated/stale events are ignored. Retry retains amount, monthly intention, programme interest, fictional email and theme. Amount alone is required; unsupported live card/PayPal removed. Monthly is a setup intention, not billing. Optional sample updates appear separately after confirmation. Existing form holds compact funding explanation and external help | Scenic opening, theme cards, form on left/photo on right desktop, photo-first mobile stack, original crops, green/cream container and pill controls. No dashboard rows above the form |
+| Numbered giving journey | Four existing steps retained. Final step includes delivery, review and an approved update from one input, with separate local simulation clearly explained | Large numeral treatment, four-button layout, detailed selected step and distinction from actual payment tracking |
+| About / role portraits | Foundation as Thomas Barnardo House in 1961, current education/family focus, source-attributed Kenyan Board position. UK–Kenya graphic is historical partnership context only. Portraits explain illustrative roles, not names/current employment locations | Connection aesthetic, portrait geometry and About section order |
+| Footer / image labels | Current-site link points to kch.co.ke. Reports/help routes added within original three-column pattern; help and current-site link share the contact column. Captions get darker green backing/white text, retaining pill framing. Local hero copy/shortcut spacing keeps the jump link above the mobile wave | Original footer ending, thin lines, palette, scenic image sizes and curved boundaries |
+
+## Source and simulation notes
+
+See [content sources](kch-content-sources.md). Official page retrieval remained inaccessible; About, Donate and Butterfly camp were retried for this pass. Text paraphrases the supplied brief, not a freshly retrieved page or independent verification. Source dates are not reporting periods. Public claims still require KCH clarification and publication approval.
+
+The exact shared example is used: A/B/C each schedule 30 follow-ups, with 21/24/27 completed. Completion requires academic and welfare checks recorded and reviewed by a coordinator. One support-period budget is KES 120,000; confirmed KES 80,000; KES 40,000 cash still needed, including KES 10,000 pledged. Pledges are never subtracted twice or called received.
+
+There is no live M-Pesa integration, STK prompt, charge, receipt, subscription, recurring billing, email, external form submission, personal-data storage, staff dashboard or CMS. User-reported production M-Pesa difficulty was not reproduced or claimed fixed. Artwork is illustrative, not programme/staff evidence. No new artwork was generated.
+
+## Visual review
+
+[Review index](review/README.md) links matching desktop 1440×1000 and mobile 375×812 before/after captures for all five routes (20 images), plus interaction states. Full side-by-side HTML and compact comparison boards are included. The original repository’s older preview images are untouched.
+
+Visual comparison checks scenic hero proportions, sunsets, green overlays, photographic crops, original wave path/position, organic image masks, contour backdrop, substantial atlas, ring size, river labels, footer columns and mobile giving access. Expected changes are factual copy, sparse map coverage, the shorter real programme journal, defined charts and contained simulation/details. At 320px and 375px the giving jump link is explicitly checked to sit above the wave region, without reducing hero height or type size.
+
+## Verification
+
+- `npm run build`: final build passed.
+- Sixteen Playwright checks cover direct routes, local images/fonts, browser history, 47 county paths and dropdown options, keyboard selection, neutral coverage, exactly two published markers, no network routes, all atlas modes, multiple Nairobi records, Narok/Soila, real directory filtering and null presentation.
+- Dialog focus trap, restore, Escape, source/method expansion, scroll unlock and programme-interest routing.
+- Defined 27/30 ring, explicit 21/24/27 river points, fixed scale, accessible units, single series/area and expandable definitions; separate pledge accounting.
+- Idle/pending/event confirmation, stale/duplicate handling, cancel/fail/timeout retry, automatic timeout, retained theme/intent/email, optional post-confirmation updates and absence of POST submissions.
+- Genuine August 2025 activity/date, illustrative art, Kenyan leadership, historical partnership, role portraits, verified-source-basis help links and reports hash navigation.
+- Mobile navigation/overflow at 320 and 375px, visible jump-to-form above curved boundary, and desktop/mobile form/photo alignment at 320/375/760/768/1024/1440px.
+- Original hero height/crop/wave and stronger caption colours. The 375px source hero remains 780px tall; it was not shortened.
+- Initial run: 14 passed. Two test assumptions were corrected (chart SVG selector included icons; expected mobile hero height ignored the source’s 780px rule). Both targeted checks passed. Mobile/form alignment checks also passed after the jump-link spacing refinement. No unresolved test failure remains.
+- `git diff --check` passed. Entry point, inactive components/styles and original image files were verified unchanged. All 16 browser checks passed across the initial run and corrected targeted reruns.
+
+## KCH input still needed
+
+Approve organisation/governance/programme copy and republication; clarify counts, reporting periods and overlap; confirm programme locations without identifying families; provide approved imagery and staff profiles/permissions; supply actual comparable observations, funding needs, reports and audit evidence; reconfirm contact/confidential feedback routes and verified payment/recurring/update-delivery mechanisms.

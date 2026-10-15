@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useReducer } from "react";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -20,13 +20,15 @@ import {
 import {
   countyMap,
   projects,
-  outcomes,
-  outcomeTypes,
-  totals,
-  assessment,
-  nextAction,
-  programmeNames,
+  countyProgrammes,
+  programmesForCounty,
+  followUps,
+  exampleBudget,
+  cashRequired,
+  exampleLabel,
+  exampleUpdate,
 } from "./data";
+import { initialPayment, paymentReducer } from "./payment";
 const images = {
   journey: "/images/discovery-journey.png",
   together: "/images/discovery-together.png",
@@ -52,6 +54,10 @@ function Link({ to, children, className = "", ...props }) {
           history.pushState({}, "", to);
           window.dispatchEvent(new PopStateEvent("popstate"));
           window.scrollTo({ top: 0, behavior: "instant" });
+          if (location.hash)
+            requestAnimationFrame(() =>
+              document.getElementById(location.hash.slice(1))?.scrollIntoView(),
+            );
         }
       }}
     >
@@ -86,8 +92,8 @@ function Header({ path }) {
   return (
     <>
       <div className="d-concept">
-        DESIGN 02 · PRESENTATION CONCEPT · UNVERIFIED FIGURES / CREATED IMAGERY
-        / PAYMENTS NOT LIVE
+        DESIGN 02 · PRESENTATION CONCEPT · PUBLISHED DESCRIPTIONS / ILLUSTRATIVE
+        IMAGERY & EXAMPLES / PAYMENTS NOT LIVE
       </div>
       <header className="d-header">
         <Logo />
@@ -196,6 +202,9 @@ function Footer() {
       <div className="d-footer-links">
         <Logo />
         <div>
+          <Link to="/impact#reports">
+            Reports &amp; financials <ArrowUpRight size={14} />
+          </Link>
           {Object.entries(routes).map(([p, t]) => (
             <Link key={p} to={p}>
               {t}
@@ -203,21 +212,53 @@ function Footer() {
             </Link>
           ))}
         </div>
-        <a
-          href="https://www.kenyachildrenshomes.org.uk/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          The organisation’s current website <ArrowUpRight size={15} />
-        </a>
+        <div className="d-footer-contact">
+          <a href="https://kch.co.ke/" target="_blank" rel="noreferrer">
+            The organisation’s current website <ArrowUpRight size={15} />
+          </a>
+          <a href="mailto:fundraising@kch.co.ke">
+            Giving help &amp; enquiries <ArrowUpRight size={15} />
+          </a>
+        </div>
       </div>
       <div className="d-footer-bottom">
         <span>
           © {new Date().getFullYear()} Kenya Children’s Homes · Design concept
         </span>
-        <span>UK BASE / KENYAN HEART</span>
+        <span>KENYAN LEADERSHIP / A HISTORY OF CARE</span>
       </div>
     </footer>
+  );
+}
+function FundingExample() {
+  return (
+    <div className="d-funding-example">
+      <p className="d-example-label">{exampleLabel}</p>
+      <p>
+        One support period:{" "}
+        <strong>KES {exampleBudget.required.toLocaleString()}</strong> budget;{" "}
+        <strong>KES {exampleBudget.confirmed.toLocaleString()}</strong>{" "}
+        confirmed contributions.
+      </p>
+      <div
+        className="d-funding-bar"
+        role="img"
+        aria-label="KES 80,000 confirmed of KES 120,000 example budget"
+      >
+        <span
+          style={{
+            width: `${(exampleBudget.confirmed / exampleBudget.required) * 100}%`,
+          }}
+        />
+      </div>
+      <p>
+        <strong>
+          KES {cashRequired(exampleBudget).toLocaleString()} cash still required
+        </strong>
+        , of which KES {exampleBudget.pledged.toLocaleString()} is pledged.
+        Pledges are not received funds.
+      </p>
+    </div>
   );
 }
 function ProjectDialog({ project: p, onClose }) {
@@ -225,6 +266,8 @@ function ProjectDialog({ project: p, onClose }) {
   useEffect(() => {
     if (!p) return;
     const previous = document.activeElement;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     close.current?.focus();
     const fn = (e) => {
       if (e.key === "Escape") onClose();
@@ -232,6 +275,7 @@ function ProjectDialog({ project: p, onClose }) {
     document.addEventListener("keydown", fn);
     return () => {
       document.removeEventListener("keydown", fn);
+      document.body.style.overflow = oldOverflow;
       previous?.focus();
     };
   }, [p]);
@@ -246,7 +290,9 @@ function ProjectDialog({ project: p, onClose }) {
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => {
           if (e.key === "Tab") {
-            const nodes = [...e.currentTarget.querySelectorAll("button,a")];
+            const nodes = [
+              ...e.currentTarget.querySelectorAll("button,a,summary"),
+            ];
             if (e.shiftKey && document.activeElement === nodes[0]) {
               e.preventDefault();
               nodes.at(-1).focus();
@@ -270,34 +316,70 @@ function ProjectDialog({ project: p, onClose }) {
         </Label>
         <h2 id="d-project-title">{p.title}</h2>
         <p>{p.description}</p>
-        <div className="d-dialog-metrics">
-          <div>
-            <strong>{p.progress}%</strong>
-            <span>Delivery progress</span>
-          </div>
-          <div>
-            <strong>{p.children}</strong>
-            <span>Programme places</span>
-          </div>
-        </div>
-        <Label>CURRENT ASSESSMENT</Label>
-        <p>{assessment(p)}</p>
-        <Label>NEXT STEP</Label>
-        <p>{nextAction(p)}</p>
-        <CTA to="/donate">Help the next chapter unfold</CTA>
+        <p className="d-programme-measure">{p.measure}</p>
+        <Label>
+          {p.id === "butterfly"
+            ? "AUGUST 2025 / BUTTERFLY CAMP"
+            : "SOURCE NOTE / 15 OCTOBER 2026"}
+        </Label>
+        <p>
+          {p.update}{" "}
+          {p.updateSource && (
+            <a className="d-inline-link" href={p.updateSource}>
+              Read KCH’s dated account ↗
+            </a>
+          )}
+        </p>
+        {p.id === "butterfly" && (
+          <>
+            <p className="d-example-label">{exampleLabel}</p>
+            <p>{exampleUpdate}</p>
+            <FundingExample />
+          </>
+        )}
+        <details className="d-evidence-note">
+          <summary>Sources, periods &amp; example method</summary>
+          <p>
+            Based on the supplied source brief reviewed 15 October 2026. Live
+            retrieval was unavailable; the review date is not a reporting
+            period. Claims await KCH clarification and republication approval.
+            Counts with different scope and periods are not added.{" "}
+            <a href={p.source}>KCH programme description ↗</a>.
+          </p>
+          {p.id === "butterfly" && (
+            <p>
+              Fictional support periods A/B/C: 21/30, 24/30 and 27/30
+              completed/scheduled follow-ups. Both academic-progress and welfare
+              checks must be recorded and reviewed by a coordinator to count as
+              completed. These are delivery observations, not wellbeing results.
+              Budget minus confirmed contributions gives remaining cash need;
+              pledges stay inside that need.
+            </p>
+          )}
+        </details>
+        <CTA to={`/donate?programme=${p.id}`}>Help the next chapter unfold</CTA>
+        <p className="d-input-hint">
+          Programme interest is carried forward, without promising restricted
+          allocation.
+        </p>
       </section>
     </div>
   );
 }
+
 function Atlas({ mode = "discovery" }) {
   const [countyId, setCountyId] = useState("nairobi");
   const [hover, setHover] = useState(null);
-  const [layer, setLayer] = useState(mode === "impact" ? "Learning" : "All");
+  const [programmeId, setProgrammeId] = useState("kibera");
   const [centres, setCentres] = useState({});
   const [detail, setDetail] = useState(null);
   const svg = useRef(null);
-  const p = projects.find((x) => x.id === (hover || countyId)) || projects[0];
-  const outcome = outcomes.find((x) => x.id === p.id);
+  const county = countyMap.locations.find((c) => c.id === (hover || countyId));
+  const records = programmesForCounty(county.id);
+  const p = records.find((p) => p.id === programmeId) || records[0];
+  const publishedCounties = countyMap.locations.filter(
+    (c) => countyProgrammes[c.id].length > 0,
+  );
   useEffect(() => {
     const points = {};
     svg.current?.querySelectorAll("[data-county]").forEach((path) => {
@@ -309,31 +391,19 @@ function Atlas({ mode = "discovery" }) {
     });
     setCentres(points);
   }, []);
-  const hub = centres.nairobi;
   const isImpact = mode === "impact";
-  const options = isImpact
-    ? ["Learning", "Belonging", "Wellbeing"]
-    : ["All", "Active", "Completed", "Planned"];
-  const chosenMetric =
-    {
-      All: "learning",
-      Learning: "learning",
-      Belonging: "families",
-      Wellbeing: "meals",
-    }[layer] || "learning";
-  const activeCount = isImpact
-    ? outcomes.reduce((n, o) => n + o[chosenMetric], 0)
-    : projects.filter((x) => layer === "All" || x.status === layer).length;
-  const locations = projects.filter(
-    (x) => layer === "All" || x.status === layer,
-  );
+  function select(id) {
+    setCountyId(id);
+    setHover(null);
+    setProgrammeId(programmesForCounty(id)[0]?.id || "");
+  }
   return (
     <section className={`d-atlas d-atlas-${mode}`} id="discover-kenya">
       <div className="d-atlas-heading">
         <div>
           <Label>
             {isImpact
-              ? "AN ATLAS OF EVERYDAY CHANGE"
+              ? "THE PLACES BEHIND THE WORK"
               : "THE PLACES BEHIND THE STORIES"}
           </Label>
           <h2>
@@ -345,30 +415,25 @@ function Atlas({ mode = "discovery" }) {
           </h2>
         </div>
         <p>
-          {isImpact
-            ? "Follow the connections between learning, belonging, and wellbeing. Every dot represents a place; every place has people at its heart."
-            : "Travel through the map, one county at a time. Discover the work underway, the local priorities, and the next chapters waiting to unfold."}
+          Explore published programme locations in Nairobi and Narok. County
+          outlines show geography, not nationwide coverage; other programme
+          locations still need clarification.
         </p>
       </div>
       <div className="d-atlas-toolbar">
-        <div className="d-pills" aria-label="Map layer">
-          {options.map((t) => (
+        <div className="d-pills" aria-label="Published county locations">
+          {publishedCounties.map((c) => (
             <button
-              key={t}
-              className={layer === t ? "selected" : ""}
-              aria-pressed={layer === t}
-              onClick={() => setLayer(t)}
+              key={c.id}
+              className={countyId === c.id ? "selected" : ""}
+              aria-pressed={countyId === c.id}
+              onClick={() => select(c.id)}
             >
-              {t}
+              {c.name}
             </button>
           ))}
         </div>
-        <span className="d-label">
-          {activeCount.toLocaleString()}{" "}
-          {isImpact
-            ? outcomeTypes[chosenMetric].unit.toUpperCase()
-            : "PROJECTS IN VIEW"}
-        </span>
+        <span className="d-label">PUBLISHED LOCATIONS / COUNTY LEVEL</span>
       </div>
       <div className="d-atlas-layout">
         <div className="d-atlas-chart">
@@ -381,7 +446,7 @@ function Atlas({ mode = "discovery" }) {
             ref={svg}
             viewBox="-55 -25 565 640"
             role="group"
-            aria-label="Kenya county story atlas"
+            aria-label="Kenya county programme atlas"
           >
             <defs>
               <pattern
@@ -399,93 +464,73 @@ function Atlas({ mode = "discovery" }) {
               <path d="M-20 285H490M220 0V580" />
             </g>
             <g className="d-atlas-county-paths">
-              {countyMap.locations.map((c, i) => (
-                <path
-                  key={c.id}
-                  data-county={c.id}
-                  d={c.path}
-                  role="button"
-                  tabIndex="0"
-                  aria-label={`${c.name}, ${projects[i].status} project`}
-                  aria-pressed={countyId === c.id}
-                  className={`${p.id === c.id ? "selected" : ""} ${!isImpact && layer !== "All" && projects[i].status !== layer ? "faded" : ""}`}
-                  fill={p.id === c.id ? "#b9392d" : `url(#atlas-hatch-${mode})`}
-                  onMouseEnter={() => setHover(c.id)}
-                  onMouseLeave={() => setHover(null)}
-                  onFocus={() => setHover(c.id)}
-                  onBlur={() => setHover(null)}
-                  onClick={() => {
-                    setCountyId(c.id);
-                    setHover(null);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === " " || e.key === "Enter") {
-                      e.preventDefault();
-                      setCountyId(c.id);
-                      setHover(null);
+              {countyMap.locations.map((c) => {
+                const known = countyProgrammes[c.id].length > 0;
+                return (
+                  <path
+                    key={c.id}
+                    data-county={c.id}
+                    d={c.path}
+                    role="button"
+                    tabIndex="0"
+                    aria-label={`${c.name}, ${known ? "published programme locations" : "no published programme record"}`}
+                    aria-pressed={countyId === c.id}
+                    className={`${known ? "published" : "neutral"} ${county.id === c.id && known ? "selected" : ""}`}
+                    fill={
+                      county.id === c.id && known
+                        ? "#b9392d"
+                        : known
+                          ? `url(#atlas-hatch-${mode})`
+                          : "#dde1d1"
                     }
-                  }}
-                >
-                  <title>{c.name}</title>
-                </path>
-              ))}
+                    onMouseEnter={() => setHover(c.id)}
+                    onMouseLeave={() => setHover(null)}
+                    onFocus={() => setHover(c.id)}
+                    onBlur={() => setHover(null)}
+                    onClick={() => select(c.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === " " || e.key === "Enter") {
+                        e.preventDefault();
+                        select(c.id);
+                      }
+                    }}
+                  >
+                    <title>
+                      {c.name} ·{" "}
+                      {known
+                        ? "Published programme locations"
+                        : "No programme information published here"}
+                    </title>
+                  </path>
+                );
+              })}
             </g>
-            {hub && (
-              <g className="d-atlas-connections" aria-hidden="true">
-                {[
-                  "turkana",
-                  "kisumu",
-                  "mombasa",
-                  "garissa",
-                  "nakuru",
-                  "marsabit",
-                ].map(
-                  (id) =>
-                    centres[id] && (
-                      <path
-                        key={id}
-                        d={`M${hub.x} ${hub.y} Q${(hub.x + centres[id].x) / 2 + 70} ${(hub.y + centres[id].y) / 2 - 55} ${centres[id].x} ${centres[id].y}`}
-                      />
-                    ),
-                )}
-                {projects.map(
-                  (x, i) =>
-                    centres[x.id] && (
-                      <circle
-                        key={x.id}
-                        cx={centres[x.id].x}
-                        cy={centres[x.id].y}
-                        r={
-                          x.id === p.id
-                            ? 8
-                            : isImpact
-                              ? 2 +
-                                (outcomes[i][chosenMetric] /
-                                  Math.max(
-                                    ...outcomes.map((o) => o[chosenMetric]),
-                                  )) *
-                                  6
-                              : layer === "All" || x.status === layer
-                                ? 4
-                                : 1.5
-                        }
-                        className={x.id === p.id ? "selected" : ""}
-                      />
-                    ),
-                )}
-              </g>
-            )}
-            {centres[p.id] && (
+            <g className="d-atlas-connections" aria-hidden="true">
+              {publishedCounties.map(
+                (c) =>
+                  centres[c.id] && (
+                    <circle
+                      key={c.id}
+                      data-location={c.id}
+                      cx={centres[c.id].x}
+                      cy={centres[c.id].y}
+                      r={c.id === county.id ? 8 : 4}
+                      className={c.id === county.id ? "selected" : ""}
+                    />
+                  ),
+              )}
+            </g>
+            {centres[county.id] && (
               <g
                 className="d-atlas-pin"
                 aria-hidden="true"
-                transform={`translate(${centres[p.id].x} ${centres[p.id].y})`}
+                transform={`translate(${centres[county.id].x} ${centres[county.id].y})`}
               >
                 <circle r="14" />
                 <path d="M0 -32V-14" />
                 <rect x="-58" y="-54" width="116" height="24" rx="12" />
                 <text textAnchor="middle" y="-38">
-                  {p.county.toUpperCase()}
+                  {county.name.toUpperCase()}
                 </text>
               </g>
             )}
@@ -493,7 +538,7 @@ function Atlas({ mode = "discovery" }) {
           <div className="d-atlas-key">
             <span>
               <i />
-              Community connections
+              Published location
             </span>
             <span>
               <i />
@@ -510,88 +555,95 @@ function Atlas({ mode = "discovery" }) {
               id={`atlas-${mode}`}
               aria-label="Find a county"
               value={countyId}
-              onChange={(e) => {
-                setCountyId(e.target.value);
-                setHover(null);
-              }}
+              onChange={(e) => select(e.target.value)}
             >
-              {projects.map((x) => (
-                <option value={x.id} key={x.id}>
-                  {x.county}
+              {countyMap.locations.map((c) => (
+                <option value={c.id} key={c.id}>
+                  {c.name}
                 </option>
               ))}
             </select>
             <ChevronDown size={18} />
           </div>
+          {records.length > 1 && (
+            <>
+              <label htmlFor={`programme-${mode}`} className="d-label">
+                CHOOSE A PROGRAMME
+              </label>
+              <div className="d-select">
+                <select
+                  id={`programme-${mode}`}
+                  aria-label="Choose a programme"
+                  value={p.id}
+                  onChange={(e) => setProgrammeId(e.target.value)}
+                >
+                  {records.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.title}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown size={18} />
+              </div>
+            </>
+          )}
           <Photo
-            scene={p.programme === programmeNames[0] ? "together" : "play"}
+            scene={p?.id === "soila" ? "play" : p ? "together" : "journey"}
             className="d-atlas-photo"
           />
           <Label>
-            <MapPin size={13} /> {p.county.toUpperCase()} /{" "}
-            {isImpact ? "A PLACE TO GROW" : p.status.toUpperCase()}
+            <MapPin size={13} />
+            {county.name.toUpperCase()} /{" "}
+            {p ? "ONGOING PROGRAMME" : "LOCATION CONTEXT"}
           </Label>
-          <h3>
-            {isImpact
-              ? {
-                  learning: "The freedom to discover.",
-                  families: "The comfort of belonging.",
-                  meals: "The foundation of wellbeing.",
-                }[chosenMetric]
-              : p.title}
-          </h3>
-          {isImpact ? (
+          <h3>{p ? p.title : "No programme information published here"}</h3>
+          <p>
+            {p
+              ? p.description
+              : "This does not mean there is no need, or that KCH does not operate here."}
+          </p>
+          {p && (
             <>
-              <strong className="d-atlas-stat">
-                {outcome[chosenMetric].toLocaleString()}
-              </strong>
-              <p>{outcomeTypes[chosenMetric].unit}</p>
-            </>
-          ) : (
-            <>
-              <p>{assessment(p)}</p>
               <div className="d-next">
-                <Label>THE NEXT CHAPTER</Label>
-                <p>{nextAction(p)}</p>
-              </div>
-              <div className="d-atlas-progress">
-                <span style={{ width: `${p.progress}%` }} />
-              </div>
-              <div className="d-atlas-meta">
-                <span>{p.progress}% delivery progress</span>
-                <span>{p.children} places</span>
+                <Label>REPORTING CONTEXT</Label>
+                <p>{p.measure}</p>
               </div>
               <button className="d-text-link" onClick={() => setDetail(p)}>
-                Read the project story <ArrowUpRight size={18} />
+                Read the programme story <ArrowUpRight size={18} />
               </button>
             </>
           )}
+          <p className="d-art-note">
+            Illustrative artwork, not a photograph of this programme.
+          </p>
         </aside>
       </div>
       <p className="d-map-credit">
-        County geometry: SVG Maps / Mihai Ro · CC BY 4.0. Connections are a
-        visual storytelling device.
+        County geometry: SVG Maps / Mihai Ro · CC BY 4.0. Markers locate
+        published counties, not individual sites or addresses. The pin marks
+        county selection; contours are decorative.
       </p>
       <ProjectDialog project={detail} onClose={() => setDetail(null)} />
     </section>
   );
 }
-function ChapterStories() {
+
+function ChapterStories({ example = false }) {
   const [chapter, setChapter] = useState(0);
   const stories = [
     [
       "A place to belong.",
-      "Care starts with the everyday moments that tell a child: you matter. A listening ear. A welcoming space. Someone who keeps showing up.",
+      "KCH’s August 2025 Butterfly camp account describes academic-progress and welfare checks. It offers a moment to ask what follow-up support families need, without claiming measured outcomes.",
       "care",
     ],
     [
       "A world to discover.",
-      "One question can open a door. Learning gives children room to explore, find their voice, and imagine what comes next.",
+      "Jonathan Gloag Academy opened in Nairobi in 2002, serving KCH-connected children and local fee-paying pupils. Enrolment is not a count of charity beneficiaries.",
       "together",
     ],
     [
       "A future to shape.",
-      "Opportunity grows through connection. Families, caregivers, and communities help turn a small beginning into lasting possibility.",
+      "Soila, established in Suswa, Narok in 2005, supports protection and education for girls at risk of FGM and early marriage, including support beyond the centre.",
       "play",
     ],
   ];
@@ -600,13 +652,32 @@ function ChapterStories() {
       <div className="d-chapter-image">
         <Photo scene={stories[chapter][2]} />
         <span className="d-image-caption d-label">
-          CHAPTER 0{chapter + 1} / EVERYDAY POSSIBILITIES
+          CHAPTER 0{chapter + 1} / ILLUSTRATIVE ARTWORK
         </span>
       </div>
       <div className="d-chapter-copy">
         <Label>EVERY CHILD HAS A STORY</Label>
         <h2>{stories[chapter][0]}</h2>
-        <p>{stories[chapter][1]}</p>
+        <p>{example && chapter === 0 ? exampleUpdate : stories[chapter][1]}</p>
+        {chapter === 0 &&
+          (example ? (
+            <>
+              <p className="d-example-label">{exampleLabel}</p>
+              <details className="d-evidence-note">
+                <summary>A funding need in this example</summary>
+                <FundingExample />
+              </details>
+            </>
+          ) : (
+            <>
+              <Label>AUGUST 2025 / PUBLISHED ACTIVITY</Label>
+              <p className="d-source-line">
+                <a href="https://kch.co.ke/news/butterfly-childrens-camp/">
+                  Read KCH’s camp account ↗
+                </a>
+              </p>
+            </>
+          ))}
         <div className="d-chapter-tabs">
           {stories.map((s, i) => (
             <button
@@ -621,7 +692,9 @@ function ChapterStories() {
             </button>
           ))}
         </div>
-        <CTA to="/impact">Discover the difference</CTA>
+        <CTA to={`/donate?programme=${["butterfly", "jga", "soila"][chapter]}`}>
+          Support the next chapter
+        </CTA>
       </div>
     </section>
   );
@@ -654,11 +727,11 @@ function Home() {
           <em>a whole world opens up.</em>
         </h2>
         <div className="d-intro-footer">
-          <span className="d-intro-coordinate">UK ↗ KENYA</span>
+          <span className="d-intro-coordinate">ROOTED IN KENYA</span>
           <p>
-            Based in the United Kingdom, with a heart rooted in Kenya.
-            Connecting people, communities, and everyday acts of care with a
-            brighter tomorrow.
+            KCH supports education, sponsorship, reintegration and family life.
+            Its published account describes Kenyan Board leadership following
+            handover at the end of 2025.
           </p>
           <Link to="/about" className="d-text-link">
             Meet the people behind the purpose <ArrowUpRight size={20} />
@@ -710,21 +783,29 @@ function About() {
             belonging.
           </p>
           <p>
-            Kenya Children’s Homes is based in the UK, with its work centred in
-            Kenya. The vision behind this website is a connection between
-            generous supporters and care that happens close to home.
+            Founded in 1961 as Thomas Barnardo House, KCH now emphasises
+            education, sponsorship, reintegration and family support. Its
+            published account describes Kenyan Board leadership after handover
+            at the end of 2025.{" "}
+            <a className="d-inline-link" href="https://kch.co.ke/about/">
+              Read KCH’s history ↗
+            </a>
+            .
           </p>
         </div>
       </section>
       <section className="d-bridge d-section">
         <div>
-          <Label>CONNECTED BY CARE</Label>
+          <Label>HISTORICAL CONNECTIONS</Label>
           <h2>
             Across borders.
             <br />
             <em>Close to the heart.</em>
           </h2>
-          <p>Explore the two sides of a shared purpose.</p>
+          <p>
+            A symbolic historical UK–Kenya partnership story, not a verified
+            current support structure.
+          </p>
           <div className="d-pills">
             {["United Kingdom", "Kenya"].map((t) => (
               <button
@@ -741,12 +822,12 @@ function About() {
             <h3>
               {step === "Kenya"
                 ? "Local care. Lasting connections."
-                : "A community of possibility."}
+                : "A historical partnership."}
             </h3>
             <p>
               {step === "Kenya"
                 ? "Local relationships connect children and families with care, learning, and everyday support."
-                : "Supporters, partnerships, and fundraising bring people together around a purpose that crosses borders."}
+                : "UK connections form part of KCH’s history. This illustration does not establish current partners, funding routes or a UK operating base."}
             </p>
           </div>
         </div>
@@ -754,7 +835,7 @@ function About() {
           <svg
             viewBox="0 0 600 440"
             role="img"
-            aria-label="Story route between the UK and Kenya"
+            aria-label="Symbolic historical partnership between the UK and Kenya"
           >
             <circle cx="300" cy="220" r="180" />
             <ellipse cx="300" cy="220" rx="105" ry="180" />
@@ -772,13 +853,13 @@ function About() {
               ♡
             </text>
           </svg>
-          <Label>A SHARED PURPOSE / A WORLD APART</Label>
+          <Label>HISTORICAL PARTNERSHIP / SYMBOLIC ILLUSTRATION</Label>
         </div>
       </section>
       <section className="d-team d-section">
         <div className="d-section-heading">
           <div>
-            <Label>THE PEOPLE BEHIND THE CONNECTION</Label>
+            <Label>THE ROLES BEHIND THE WORK</Label>
             <h2>
               Open hearts.
               <br />
@@ -786,16 +867,16 @@ function About() {
             </h2>
           </div>
           <p>
-            Local knowledge and support across borders.
+            Role explanations, not current staff profiles.
             <br />
             One commitment to childhood.
           </p>
         </div>
         <div className="d-team-grid">
           {[
-            ["educator", "Community & care", "Kenya"],
-            ["coordinator", "Programme coordination", "Kenya"],
-            ["support", "Supporter relations", "United Kingdom"],
+            ["educator", "Community & care", "Illustrative role"],
+            ["coordinator", "Programme coordination", "Illustrative role"],
+            ["support", "Supporter relations", "Illustrative role"],
           ].map(([s, t, p]) => (
             <article key={s}>
               <div
@@ -816,7 +897,8 @@ function About() {
           ))}
         </div>
         <p className="d-map-credit">
-          Editorial role portraits; staff profiles remain to be confirmed.
+          Illustrative role portraits, not KCH staff. Approved profiles were not
+          supplied.
         </p>
       </section>
       <ChapterStories />
@@ -824,10 +906,9 @@ function About() {
   );
 }
 function DeliveryChart() {
-  const [stage, setStage] = useState("Active");
-  const count = projects.filter((p) => p.status === stage).length;
-  const colors = ["#b9392d", "#243b32", "#d9c8b4"];
-  let offset = 0;
+  const [view, setView] = useState("Completed");
+  const record = followUps.find((r) => r.period === "C");
+  const rate = (record.completed / record.scheduled) * 100;
   return (
     <section className="d-delivery-chart">
       <div>
@@ -835,19 +916,21 @@ function DeliveryChart() {
         <h2>
           From a first step
           <br />
-          to a finished chapter.
+          to a reviewed chapter.
         </h2>
+        <p className="d-example-label">{exampleLabel}</p>
         <p>
-          Projects pass through different stages. Choose a stage to explore what
-          each one means.
+          Education and family follow-up in example period C: {record.completed}{" "}
+          of {record.scheduled} scheduled follow-ups completed. This measures
+          delivery, not how finished a care programme is.
         </p>
         <div className="d-pills">
-          {["Active", "Completed", "Planned"].map((t) => (
+          {["Completed", "Scheduled"].map((t) => (
             <button
               key={t}
-              aria-pressed={stage === t}
-              className={stage === t ? "selected" : ""}
-              onClick={() => setStage(t)}
+              aria-pressed={view === t}
+              className={view === t ? "selected" : ""}
+              onClick={() => setView(t)}
             >
               {t}
             </button>
@@ -858,55 +941,54 @@ function DeliveryChart() {
         <svg
           viewBox="0 0 260 260"
           role="img"
-          aria-label={`${totals.active} active, ${totals.completed} completed, ${totals.planned} planned projects`}
+          aria-label={`Illustrative example, not KCH results: period C, ${record.completed} of ${record.scheduled} scheduled follow-ups completed, ${rate}% completion.`}
         >
-          {["Active", "Completed", "Planned"].map((s, i) => {
-            const n = projects.filter((p) => p.status === s).length;
-            const portion = (n / 47) * 100;
-            const current = offset;
-            offset += portion;
-            return (
-              <circle
-                key={s}
-                cx="130"
-                cy="130"
-                r="100"
-                pathLength="100"
-                fill="none"
-                stroke={colors[i]}
-                strokeWidth={stage === s ? 21 : 12}
-                strokeDasharray={`${portion - 1.5} ${100 - portion + 1.5}`}
-                strokeDashoffset={-current}
-                transform="rotate(-90 130 130)"
-              />
-            );
-          })}
+          <circle
+            cx="130"
+            cy="130"
+            r="100"
+            pathLength="100"
+            fill="none"
+            stroke="#d9c8b4"
+            strokeWidth="12"
+          />
+          <circle
+            className="d-delivery-completed"
+            cx="130"
+            cy="130"
+            r="100"
+            pathLength="100"
+            fill="none"
+            stroke="#b9392d"
+            strokeWidth="21"
+            strokeDasharray={`${rate} ${100 - rate}`}
+            transform="rotate(-90 130 130)"
+          />
         </svg>
         <div>
-          <strong>{count}</strong>
-          <span>{stage} projects</span>
+          <strong>
+            {view === "Completed" ? record.completed : record.scheduled}
+          </strong>
+          <span>{view.toLowerCase()} follow-ups / C</span>
         </div>
       </div>
       <div className="d-stage-story" aria-live="polite">
-        <Label>{stage.toUpperCase()} / THE CURRENT CHAPTER</Label>
-        <h3>
-          {stage === "Active"
-            ? "Care in motion."
-            : stage === "Completed"
-              ? "A milestone, not an ending."
-              : "Possibilities taking shape."}
-        </h3>
+        <Label>EXAMPLE PERIOD C / 90% COMPLETION</Label>
+        <h3>A check, then a response.</h3>
         <p>
-          {stage === "Active"
-            ? "Local delivery is underway. Teams review participation, resources, and the next milestone."
-            : stage === "Completed"
-              ? "Delivery milestones are complete. Follow-up visits and community feedback guide what comes next."
-              : "Community priorities are identified. Partners, funding, and delivery dates need to be confirmed."}
+          {view === "Completed"
+            ? "Completed means both academic-progress and welfare checks were recorded and reviewed by a coordinator."
+            : "Scheduled means a follow-up was due during that fictional support period. Three of the 30 scheduled follow-ups were not completed under the example definition."}
+        </p>
+        <p>
+          These are fictional counts, not KCH records or evidence of improved
+          child wellbeing.
         </p>
       </div>
     </section>
   );
 }
+
 function Projects() {
   const [status, setStatus] = useState("All");
   const [query, setQuery] = useState("");
@@ -924,7 +1006,7 @@ function Projects() {
         label="EXPLORE THE PLACES / FOLLOW THE PROGRESS"
         title="Every place."
         accent="A new chapter."
-        description="Discover the programmes taking shape, the milestones already reached, and the possibilities still ahead."
+        description="Discover KCH’s published programmes in education, family support, protection and mission sustainability, with reporting context and honest information gaps."
       />
       <div className="d-section">
         <DeliveryChart />
@@ -936,11 +1018,11 @@ function Projects() {
             <Label>THE PROJECT JOURNAL</Label>
             <h2>Stories in the making.</h2>
           </div>
-          <span className="d-label">{filtered.length} PROJECTS</span>
+          <span className="d-label">{filtered.length} PROGRAMME RECORDS</span>
         </div>
         <div className="d-journal-filters">
           <div className="d-pills">
-            {["All", "Active", "Completed", "Planned"].map((s) => (
+            {["All", "Ongoing"].map((s) => (
               <button
                 className={status === s ? "selected" : ""}
                 aria-pressed={status === s}
@@ -976,17 +1058,16 @@ function Projects() {
               <span className={`d-stage ${p.status.toLowerCase()}`}>
                 {p.status}
               </span>
-              <span className="d-row-progress">
-                <i style={{ width: `${p.progress}%` }} />
+              <span className="d-row-descriptor">
+                {p.since ? `Since ${p.since}` : "Continuing support"}
               </span>
-              <span className="d-row-percent">{p.progress}%</span>
               <ArrowUpRight size={22} />
             </button>
           ))}
         </div>
         {!filtered.length && (
           <div className="d-empty">
-            <h3>No projects match.</h3>
+            <h3>No programmes match.</h3>
             <button
               className="d-text-link"
               onClick={() => {
@@ -1004,13 +1085,45 @@ function Projects() {
   );
 }
 function OutcomeRiver() {
-  const [metric, setMetric] = useState("learning");
-  const [year, setYear] = useState("2026");
-  const keys = Object.keys(outcomeTypes);
-  const factor = { 2024: 0.62, 2025: 0.81, 2026: 1 }[year];
-  const total = Math.round(
-    outcomes.reduce((n, o) => n + o[metric], 0) * factor,
+  const [metric, setMetric] = useState("completed");
+  const [period, setPeriod] = useState("C");
+  const current = followUps.find((r) => r.period === period);
+  const measures = {
+    completed: {
+      label: "Completed",
+      unit: `of ${current.scheduled} scheduled follow-ups`,
+      Icon: BookOpen,
+    },
+    scheduled: {
+      label: "Scheduled",
+      unit: "follow-ups due in the period",
+      Icon: Heart,
+    },
+    rate: {
+      label: "Completion",
+      unit: "of scheduled follow-ups",
+      Icon: Sprout,
+    },
+  };
+  const total =
+    metric === "rate"
+      ? Math.round((current.completed / current.scheduled) * 100)
+      : current[metric];
+  // Fixed 0–30 completed-follow-up scale; all three records schedule 30.
+  const scaleMax = 30;
+  const points = followUps.map((r, i) => ({
+    x: 40 + i * 310,
+    y: 230 - (r.completed / scaleMax) * 200,
+    record: r,
+  }));
+  const line = points.reduce(
+    (path, p, i) =>
+      i === 0
+        ? `M${p.x} ${p.y}`
+        : `${path} C${(points[i - 1].x + p.x) / 2} ${points[i - 1].y} ${(points[i - 1].x + p.x) / 2} ${p.y} ${p.x} ${p.y}`,
+    "",
   );
+  const fill = `${line} L${points.at(-1).x} 230 L${points[0].x} 230Z`;
   return (
     <section className="d-outcome-river d-section">
       <div className="d-section-heading">
@@ -1023,110 +1136,147 @@ function OutcomeRiver() {
           </h2>
         </div>
         <label className="d-year-label">
-          Reporting year
+          Example period
           <select
-            aria-label="Impact reporting year"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
+            aria-label="Example follow-up period"
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
           >
-            {["2024", "2025", "2026"].map((y) => (
-              <option key={y}>{y}</option>
+            {followUps.map((r) => (
+              <option key={r.period}>{r.period}</option>
             ))}
           </select>
         </label>
       </div>
+      <p className="d-example-label">
+        {exampleLabel} · Education &amp; family follow-up
+      </p>
       <div className="d-river-layout">
         <div className="d-river-controls">
           <div className="d-outcome-tabs">
-            {keys.map((k, i) => {
-              const Icon = [BookOpen, Heart, Sprout][i];
-              return (
-                <button
-                  key={k}
-                  className={metric === k ? "selected" : ""}
-                  aria-pressed={metric === k}
-                  onClick={() => setMetric(k)}
-                >
-                  <Icon size={24} />
-                  {outcomeTypes[k].label}
-                  <ArrowUpRight size={18} />
-                </button>
-              );
-            })}
+            {Object.entries(measures).map(([key, { label, Icon }]) => (
+              <button
+                key={key}
+                className={metric === key ? "selected" : ""}
+                aria-pressed={metric === key}
+                onClick={() => setMetric(key)}
+              >
+                <Icon size={24} />
+                {label}
+                <ArrowUpRight size={18} />
+              </button>
+            ))}
           </div>
-          <strong className="d-river-total">{total.toLocaleString()}</strong>
-          <p>{outcomeTypes[metric].unit}</p>
+          <strong className="d-river-total">
+            {total}
+            {metric === "rate" ? "%" : ""}
+          </strong>
+          <p>
+            {measures[metric].unit} · example period {period}
+          </p>
         </div>
         <div className="d-river-visual">
+          <p className="d-river-caption">
+            Completed follow-ups · fixed scale 0–30
+          </p>
           <svg
             viewBox="0 0 700 260"
             role="img"
-            aria-label={`${outcomeTypes[metric].label} growth from 2024 to 2026`}
+            aria-label="Illustrative example, not KCH results. Completed follow-ups on a fixed zero-to-30 scale: period A, 21 of 30 scheduled; B, 24 of 30; C, 27 of 30. Delivery, not child wellbeing."
           >
             <defs>
-              <linearGradient id="riverFill" x1="0" x2="1">
-                <stop stopColor="#f1d2bf" />
-                <stop offset="1" stopColor="#b9392d" />
+              <linearGradient id="riverFill" x1="0" y1="0" x2="0" y2="1">
+                <stop stopColor="#b9392d" stopOpacity=".22" />
+                <stop offset="1" stopColor="#f1d2bf" stopOpacity=".04" />
               </linearGradient>
             </defs>
-            {[0, 1, 2].map((i) => (
-              <path
-                key={i}
-                d={`M20 ${215 - i * 40} C180 ${215 - i * 30} 220 ${160 - i * 30} 360 ${165 - i * 35} S520 ${115 - i * 30} 680 ${80 - i * 30} L680 ${115 - i * 25} C540 ${150 - i * 25} 500 ${195 - i * 25} 360 ${195 - i * 25} S180 ${255 - i * 25} 20 ${245 - i * 25}Z`}
-                fill="url(#riverFill)"
-                opacity={0.35 + i * 0.25}
-              />
-            ))}
-            {[
-              [20, 202],
-              [350, 138],
-              [680, 65],
-            ].map(([x, y], i) => (
-              <g key={i}>
+            {[0, 15, 30].map((n) => (
+              <g key={n} aria-hidden="true">
                 <line
-                  x1={x}
-                  x2={x}
-                  y1="0"
-                  y2="260"
-                  stroke="#e2d6c7"
+                  x1="40"
+                  x2="660"
+                  y1={230 - (n / scaleMax) * 200}
+                  y2={230 - (n / scaleMax) * 200}
+                  stroke="#d5d8c7"
                   strokeDasharray="3 5"
                 />
+                <text x="28" y={234 - (n / scaleMax) * 200} textAnchor="end">
+                  {n}
+                </text>
+              </g>
+            ))}
+            <path data-area="completed" d={fill} fill="url(#riverFill)" />
+            <path
+              data-series="completed"
+              d={line}
+              fill="none"
+              stroke="#b9392d"
+              strokeWidth="2"
+            />
+            {points.map(({ x, y, record: r }) => (
+              <g key={r.period}>
                 <circle
+                  data-period={r.period}
                   cx={x}
                   cy={y}
-                  r={Number(year) === 2024 + i ? 8 : 4}
+                  r={period === r.period ? 7 : 4}
                   fill="#b9392d"
                 />
+                <text
+                  x={x}
+                  y={y - 15}
+                  textAnchor={
+                    r.period === "A"
+                      ? "start"
+                      : r.period === "C"
+                        ? "end"
+                        : "middle"
+                  }
+                >
+                  {r.completed}
+                </text>
               </g>
             ))}
           </svg>
           <div className="d-river-years">
-            {["2024", "2025", "2026"].map((y, i) => (
+            {followUps.map((r) => (
               <button
-                key={y}
-                onClick={() => setYear(y)}
-                aria-pressed={year === y}
-                className={year === y ? "selected" : ""}
+                key={r.period}
+                onClick={() => setPeriod(r.period)}
+                aria-pressed={period === r.period}
+                className={period === r.period ? "selected" : ""}
               >
-                {y}
+                Period {r.period}
                 <span>
-                  {Math.round(
-                    outcomes.reduce((n, o) => n + o[metric], 0) *
-                      [0.62, 0.81, 1][i],
-                  ).toLocaleString()}
+                  {r.completed} / {r.scheduled}
                 </span>
               </button>
             ))}
           </div>
-          <p className="d-river-caption">
-            Learning, belonging, and wellbeing are connected threads—not
-            isolated numbers.
-          </p>
+          <details className="d-evidence-note">
+            <summary>Definitions &amp; source context</summary>
+            <p>
+              Completed: both academic-progress and welfare checks recorded and
+              reviewed by a coordinator. Scheduled: due in that support period.
+              A/B/C are comparable fictional periods, not calendar reporting
+              years. The line joins explicit counts; the gradient is an area
+              beneath the line, not an uncertainty band or forecast. These
+              observations do not establish improved child wellbeing.
+            </p>
+            <p>
+              Inspired by KCH’s{" "}
+              <a href="https://kch.co.ke/news/butterfly-childrens-camp/">
+                August 2025 Butterfly camp account
+              </a>
+              . No comparable KCH observation series was supplied.
+            </p>
+          </details>
         </div>
       </div>
     </section>
   );
 }
+
 function Impact() {
   return (
     <>
@@ -1139,7 +1289,30 @@ function Impact() {
         description="A question asked with confidence. A shared meal. A place to belong. Discover the everyday shape of a brighter tomorrow."
       />
       <OutcomeRiver />
-      <ChapterStories />
+      <ChapterStories example />
+      <section className="d-reports d-section" id="reports">
+        <Label>EVIDENCE &amp; QUESTIONS</Label>
+        <h2>Look a little closer.</h2>
+        <p>
+          No KCH annual report or audited financial document was supplied or
+          retrieved for this preview.
+        </p>
+        <a
+          className="d-text-link"
+          href="mailto:info@kch.co.ke?subject=Reports%20and%20financial%20information"
+        >
+          Request reports <ArrowUpRight size={18} />
+        </a>
+        <details className="d-evidence-note">
+          <summary>A question about the work?</summary>
+          <p>
+            <a href="mailto:info@kch.co.ke">Contact KCH by email</a> for
+            programme questions. Keep personal case details and confidential
+            feedback out of public channels. This prototype does not submit
+            enquiries.
+          </p>
+        </details>
+      </section>
       <Atlas mode="impact" />
       <section className="d-impact-reflection d-section">
         <Label>WHAT WE HOPE TO SEE</Label>
@@ -1162,23 +1335,51 @@ function Impact() {
 function Donate() {
   const [amount, setAmount] = useState(1500);
   const [frequency, setFrequency] = useState("Once");
-  const [method, setMethod] = useState("M-Pesa");
   const [focus, setFocus] = useState("Learning");
-  const [message, setMessage] = useState("");
+  const [payment, dispatch] = useReducer(paymentReducer, initialPayment);
+  const [updates, setUpdates] = useState(false);
+  const interest = projects.find(
+    (p) => p.id === new URLSearchParams(location.search).get("programme"),
+  );
+  const pending = payment.status === "pending";
+  const confirmed = payment.status === "confirmed";
+  useEffect(() => {
+    if (!pending) return;
+    const attempt = payment.attempt;
+    const timer = setTimeout(
+      () => dispatch({ type: "result", status: "timed-out", attempt }),
+      30000,
+    );
+    return () => clearTimeout(timer);
+  }, [pending, payment.attempt]);
+  const result = (status) =>
+    dispatch({ type: "result", status, attempt: payment.attempt });
+  const messages = {
+    idle: "Ready to explore. No payment will be taken.",
+    pending:
+      "Waiting for a simulated confirmation event. No STK prompt was sent and no payment was taken.",
+    confirmed: `Local simulation confirmed for KES ${Number(amount).toLocaleString()}. No payment was taken. This is not a receipt.`,
+    cancelled:
+      "Simulation cancelled. No payment was taken. Your amount and intention are kept; you can retry.",
+    failed:
+      "Simulation failed. No payment was taken. Retry here or use Giving help to contact KCH.",
+    "timed-out":
+      "Simulation timed out without confirmation. No payment was taken. In a live service, check the result before retrying; this local preview can be retried safely.",
+  };
   const [stage, setStage] = useState(0);
   const journey = [
     ["Your decision", "A gift begins with a choice to care."],
     [
       "Payment confirmation",
-      "A future payment provider confirms the gift through M-Pesa or card.",
+      "A verified provider would need to confirm the gift before it is recorded. Here, confirmation is a local simulation; no payment is taken.",
     ],
     [
       "Programme planning",
-      "Local priorities guide how available programme resources are assigned.",
+      "Local priorities would guide available resources. Programme interest is distinct from restricted allocation, and pledges are not received cash.",
     ],
     [
-      "Everyday care",
-      "Teams turn resources into learning, family connections, and wellbeing support.",
+      "Care, review and update",
+      "Teams would deliver support, review follow-up records and prepare an approved supporter update. One input could inform the programme summary and supporter communication. A clearly labelled sample appears after mock confirmation; no email is sent.",
     ],
   ];
   return (
@@ -1189,8 +1390,24 @@ function Donate() {
         label="GIVE A LITTLE GOOD / START A NEW CHAPTER"
         title="A gift is a beginning."
         accent="See where it can go."
-        description="Choose the possibility you want to help create. Follow the journey from a generous decision to everyday care."
-      />
+        description="Support education and family care. Choose a gift or explore the journey."
+      >
+        <div className="d-hero-actions d-giving-shortcut">
+          <a
+            className="d-cta d-cta-light"
+            href="#giving-form"
+            onClick={() =>
+              requestAnimationFrame(() =>
+                document
+                  .getElementById("giving-form")
+                  ?.focus({ preventScroll: true }),
+              )
+            }
+          >
+            Go to giving form <ArrowDown size={20} />
+          </a>
+        </div>
+      </Hero>
       <section className="d-giving d-section">
         <div className="d-giving-intro">
           <Label>WHAT DOES POSSIBILITY LOOK LIKE TO YOU?</Label>
@@ -1214,6 +1431,7 @@ function Donate() {
             <button
               key={t}
               className={focus === t ? "selected" : ""}
+              disabled={pending || confirmed}
               onClick={() => setFocus(t)}
               aria-pressed={focus === t}
             >
@@ -1259,12 +1477,13 @@ function Donate() {
             </div>
           </div>
           <form
+            id="giving-form"
+            tabIndex="-1"
             className="d-giving-form"
+            data-payment-state={payment.status}
             onSubmit={(e) => {
               e.preventDefault();
-              setMessage(
-                "Thank you for exploring this giving journey. No payment was taken. M-Pesa and card checkout will be connected before launch.",
-              );
+              dispatch({ type: "start" });
             }}
           >
             <div className="d-form-heading">
@@ -1272,125 +1491,212 @@ function Donate() {
               <Heart size={24} />
             </div>
             <h2>Begin with a gift.</h2>
-            <div className="d-pills d-gift-frequency">
-              {["Once", "Monthly"].map((f) => (
-                <button
-                  type="button"
-                  key={f}
-                  aria-pressed={frequency === f}
-                  className={frequency === f ? "selected" : ""}
-                  onClick={() => {
-                    setFrequency(f);
-                    setMessage("");
-                  }}
-                >
-                  {f === "Once" ? "Give once" : "Give monthly"}
-                </button>
-              ))}
-            </div>
-            <label>
-              Choose an amount <span>KES</span>
-            </label>
-            <div className="d-gift-amounts">
-              {[500, 1500, 3000, 5000].map((a) => (
-                <button
-                  type="button"
-                  key={a}
-                  aria-pressed={Number(amount) === a}
-                  className={Number(amount) === a ? "selected" : ""}
-                  onClick={() => {
-                    setAmount(a);
-                    setMessage("");
-                  }}
-                >
-                  {a.toLocaleString()}
-                </button>
-              ))}
-            </div>
-            <label htmlFor="d-amount">Or choose your own amount</label>
-            <input
-              id="d-amount"
-              aria-label="Custom donation amount in Kenyan shillings"
-              type="number"
-              min="100"
-              max="1000000"
-              required
-              value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value);
-                setMessage("");
-              }}
-            />
-            <fieldset>
-              <legend>How would you like to give?</legend>
-              <div className="d-payment-options">
-                {["M-Pesa", "Card"].map((m) => (
+            {interest && (
+              <p className="d-interest-note">
+                Programme interest: <strong>{interest.title}</strong>. This
+                expresses interest, without promising restricted allocation.
+              </p>
+            )}
+            <fieldset
+              className="d-gift-controls"
+              disabled={pending || confirmed}
+            >
+              <legend className="d-visually-hidden">Gift intention</legend>
+              <div className="d-pills d-gift-frequency">
+                {["Once", "Monthly"].map((f) => (
                   <button
                     type="button"
-                    key={m}
-                    aria-pressed={method === m}
-                    className={method === m ? "selected" : ""}
+                    key={f}
+                    aria-pressed={frequency === f}
+                    className={frequency === f ? "selected" : ""}
                     onClick={() => {
-                      setMethod(m);
-                      setMessage("");
+                      setFrequency(f);
                     }}
                   >
-                    {m === "M-Pesa" ? (
-                      <Smartphone size={18} />
-                    ) : (
-                      <CreditCard size={18} />
-                    )}{" "}
-                    {m}
-                    {method === m && <Check size={16} />}
+                    {f === "Once" ? "Give once" : "Give monthly"}
                   </button>
                 ))}
               </div>
+              {frequency === "Monthly" && (
+                <p className="d-monthly-note">
+                  Monthly giving is an intention/setup request. No recurring
+                  mechanism has been verified; this toggle does not set up
+                  billing.{" "}
+                  <a href="mailto:fundraising@kch.co.ke?subject=Monthly%20giving%20enquiry">
+                    Ask KCH about monthly support ↗
+                  </a>
+                  .
+                </p>
+              )}
+              <label>
+                Choose an amount <span>KES</span>
+              </label>
+              <div className="d-gift-amounts">
+                {[500, 1500, 3000, 5000].map((a) => (
+                  <button
+                    type="button"
+                    key={a}
+                    aria-pressed={Number(amount) === a}
+                    className={Number(amount) === a ? "selected" : ""}
+                    onClick={() => {
+                      setAmount(a);
+                    }}
+                  >
+                    {a.toLocaleString()}
+                  </button>
+                ))}
+              </div>
+              <label htmlFor="d-amount">Or choose your own amount</label>
+              <input
+                id="d-amount"
+                aria-label="Custom donation amount in Kenyan shillings"
+                type="number"
+                min="100"
+                max="1000000"
+                required
+                value={amount}
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                }}
+              />
+              <fieldset>
+                <legend>How would you like to give?</legend>
+                <div className="d-payment-options">
+                  <button
+                    type="button"
+                    className="selected"
+                    aria-pressed="true"
+                  >
+                    <Smartphone size={18} />
+                    <span>M-Pesa preview</span>
+                    <Check size={16} />
+                  </button>
+                </div>
+              </fieldset>
+              <p className="d-input-hint">
+                Local mock only. Live M-Pesa, card and PayPal availability are
+                not confirmed.
+              </p>
+              <label htmlFor="d-email">Example email (optional)</label>
+              <input
+                id="d-email"
+                type="email"
+                autoComplete="off"
+                placeholder="supporter@example.com"
+              />
             </fieldset>
-            <label htmlFor="d-email">Email address</label>
-            <input
-              id="d-email"
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="you@example.com"
-            />
-            {method === "M-Pesa" && (
-              <>
-                <label htmlFor="d-phone">M-Pesa phone number</label>
-                <input
-                  id="d-phone"
-                  type="tel"
-                  required
-                  pattern="(\+?254|0)[17][0-9]{8}"
-                  autoComplete="tel"
-                  placeholder="0712345678"
-                />
-                <span className="d-input-hint">
-                  Use 07…, 01…, or +254… without spaces.
-                </span>
-              </>
-            )}
-            <button type="submit" className="d-cta d-submit">
-              Preview KES {Number(amount || 0).toLocaleString()}{" "}
-              {frequency === "Monthly" ? "monthly gift" : "gift"}
+            <button
+              type="submit"
+              className="d-cta d-submit"
+              disabled={pending || confirmed}
+            >
+              {confirmed
+                ? "Simulation confirmed"
+                : pending
+                  ? "Awaiting simulated result…"
+                  : `${payment.status === "idle" ? "Preview" : "Retry"} KES ${Number(amount || 0).toLocaleString()} gift`}
               <ArrowUpRight size={20} />
             </button>
             <p className="d-payment-note">
               <ShieldCheck size={15} />
-              Payment gateway not connected
+              Local preview · No payment is taken
             </p>
-            {message && (
-              <p role="status" className="d-gift-message">
-                {message}
-              </p>
+            <p className="d-gift-message" role="status" aria-live="polite">
+              {messages[payment.status]}
+            </p>
+            {pending && (
+              <fieldset className="d-simulation-controls">
+                <legend>Local simulation controls</legend>
+                <p className="d-input-hint">
+                  Choose the next event. Pending also times out after 30
+                  seconds.
+                </p>
+                {[
+                  ["confirmed", "Confirm simulation"],
+                  ["cancelled", "Cancel simulation"],
+                  ["failed", "Simulate failure"],
+                  ["timed-out", "Simulate timeout"],
+                ].map(([status, label]) => (
+                  <button
+                    type="button"
+                    className="d-text-link"
+                    key={status}
+                    onClick={() => result(status)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </fieldset>
             )}
+            {confirmed && (
+              <div className="d-sample-confirmation">
+                <Label>SAMPLE CONFIRMATION · NO PAYMENT TAKEN</Label>
+                <p>
+                  Thank you for exploring support
+                  {interest ? ` with an interest in ${interest.title}` : ""}.
+                  {frequency === "Monthly"
+                    ? " Your monthly intention has not created recurring billing."
+                    : ""}
+                </p>
+                <label className="d-update-choice">
+                  <input
+                    type="checkbox"
+                    checked={updates}
+                    onChange={(e) => setUpdates(e.target.checked)}
+                  />
+                  <span>Show a sample programme update (optional).</span>
+                </label>
+                <p className="d-input-hint">
+                  This separate choice does not create a subscription or send
+                  email.
+                </p>
+                {updates && (
+                  <details className="d-sample-update d-evidence-note" open>
+                    <summary>Sample programme update</summary>
+                    <p className="d-example-label">{exampleLabel}</p>
+                    <p>{exampleUpdate}</p>
+                    <p>
+                      This demonstrates how an approved update could appear
+                      after support. It is not actual KCH reporting or email
+                      delivery.
+                    </p>
+                  </details>
+                )}
+              </div>
+            )}
+            <a
+              className="d-text-link d-giving-help"
+              href="mailto:fundraising@kch.co.ke"
+            >
+              Giving help · contact KCH <ArrowUpRight size={18} />
+            </a>
+            <details className="d-evidence-note">
+              <summary>What a funding need can look like</summary>
+              <FundingExample />
+            </details>
             <p className="d-form-privacy">
-              This concept does not store or submit your details. Use example
-              details to explore.
+              Use fictional details only. This prototype does not store or send
+              your details. Official payment instructions need KCH confirmation
+              before live use.
             </p>
           </form>
         </div>
       </section>
+      <p className="d-other-support d-section">
+        More ways to help:{" "}
+        <a href="mailto:fundraising@kch.co.ke?subject=In-kind%20support">
+          in-kind support
+        </a>
+        ,{" "}
+        <a href="mailto:fundraising@kch.co.ke?subject=Volunteering">
+          volunteering
+        </a>{" "}
+        or{" "}
+        <a href="mailto:fundraising@kch.co.ke?subject=Partnership">
+          partnership
+        </a>
+        . Ask KCH what is currently needed.
+      </p>
       <section className="d-gift-route d-section">
         <div className="d-section-heading">
           <div>
@@ -1436,8 +1742,9 @@ function Donate() {
           </div>
         </div>
         <p className="d-map-credit">
-          Provider fees and allocation arrangements will be confirmed before
-          launch.
+          This proposed process is separate from the local form states. No live
+          provider, recurring billing, allocation or update delivery is
+          implemented.
         </p>
       </section>
     </>
@@ -1453,6 +1760,10 @@ export default function DiscoveryApp() {
   useEffect(() => {
     document.title = `${routes[path] || "Not found"} — Kenya Children’s Homes / Discovery`;
     document.querySelector("main")?.focus({ preventScroll: true });
+    if (location.hash)
+      requestAnimationFrame(() =>
+        document.getElementById(location.hash.slice(1))?.scrollIntoView(),
+      );
   }, [path]);
   return (
     <>
