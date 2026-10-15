@@ -23,12 +23,12 @@ Browser tests use `/usr/bin/chromium` in this cloud environment. Set `CHROMIUM_P
 
 ## Content and integrations
 
-- `src/data.js` contains one fictional project for each of Kenya’s 47 counties. Totals and charts derive from the same data. Replace these examples with verified project and impact records.
-- The county map supports hover, click, keyboard selection, and a mobile dropdown. Project status, search, and programme filters are functional.
-- The donation page supports preset/custom KES amounts, monthly/one-off selection, M-Pesa/card selection, and client-side validation. It never stores or submits personal details or takes payment. Use example details while testing. Payment processing, recurring billing, receipts, and CMS editing are not implemented.
-- Before payment integration, verify the selected provider’s charity eligibility and support for M-Pesa, cards, and recurring donations. Do not assume Polar supplies all three.
-- Organisation history, actual programme descriptions, verified impact, approved images, and final logo assets still need to be supplied. The current logo is a CSS approximation.
-- Production hosting must rewrite unknown application routes to `index.html` for direct route loading.
+- `src/data.js` contains six source-brief programme records across five public groupings, independent county geometry/lookups, explicit example observations and pledge-separated budget figures. Unknown numeric values are null; no generated county portfolio or beneficiary total remains.
+- The map retains all 47 counties, keyboard selection, zoom and dropdown. Only published locations from the brief are highlighted. Unknown coverage is not treated as no activity.
+- Giving is a local-only simulation: idle, pending, confirmed, cancelled, failed and timed-out states. No STK prompt, charge, recurring billing, storage, external submission, subscription or email. Use fictional details only. An event after submit is required for confirmation. Retry preserves intent.
+- Read `docs/kch-content-sources.md` for source basis, unresolved claims, image reuse status and KCH approval needs. Official pages were inaccessible during this pass; source-brief claims are not independent verification or republication approval.
+- Read `docs/main-refinement-review.md` for the component change summary and visual/test evidence. Before/after captures are in `work/screenshots/`.
+- Production hosting must rewrite unknown application routes to `index.html` for direct route loading. Hosting/deployment was not changed here.
 
 ## Asset sources
 
